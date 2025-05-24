@@ -1,6 +1,6 @@
 name: tech_challenge_3
-description: "A new Flutter project."
-publish_to: 'none'
+description: "Bytebank Tech Challenge 3"
+publish_to: "none"
 version: 0.1.0
 
 environment:
@@ -9,6 +9,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  cupertino_icons:
+  flutter_bloc:
+  dio:
+  get_it:
+  dartz:
+  logger:
+  shared_preferences:
 
 dev_dependencies:
   flutter_test:
