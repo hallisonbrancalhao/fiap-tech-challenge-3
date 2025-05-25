@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tech_challenge_3/service_locator.dart';
+import 'package:tech_challenge_3/core/routes/app_routes.dart';
+import 'package:tech_challenge_3/presentation/auth/pages/custom_signin.dart';
+import 'package:tech_challenge_3/presentation/auth/pages/custom_signup.dart';
+import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,8 +23,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(body: Center(child: Text('Hello World!'))),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      initialRoute: AppRoutes.login,
+      routes: {
+        AppRoutes.login: (context) => CustomSigninPage(),
+        AppRoutes.signup: (context) => CustomSignupPage(),
+        AppRoutes.home: (context) => const HomePage(),
+      },
     );
   }
 }
