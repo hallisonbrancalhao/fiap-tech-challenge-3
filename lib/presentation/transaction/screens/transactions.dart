@@ -1,57 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+
+import 'package:tech_challenge_3/presentation/transaction/widgets/transaction_list.dart';
+import 'package:tech_challenge_3/presentation/transaction/widgets/transaction_list_filter.dart';
 
 class TransactionsScreen extends StatelessWidget {
   const TransactionsScreen({super.key});
 
-  static NumberFormat currencyFormatter = NumberFormat.simpleCurrency(
-    locale: 'pt_BR',
-    decimalDigits: 2,
-  );
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Transações')),
+      appBar: AppBar(
+        title: const Text('Transações'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushNamed(context, '/new-transaction');
+            },
+            child: Text('Nova transação'),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Chip(label: Text('Depósito')),
-                SizedBox(width: 8),
-                Chip(label: Text('Transferência')),
-                SizedBox(width: 8),
-                OutlinedButton(child: Text('Data'), onPressed: null),
-              ],
-            ),
+            child: TransactionListFilter(),
           ),
-          ListTile(
-            title: Text('Depósito'),
-            subtitle: Text(currencyFormatter.format(150.82)),
-            trailing: Text('14/05/2025'),
-          ),
-          Divider(),
-          ListTile(
-            title: Text('Depósito'),
-            subtitle: Text(currencyFormatter.format(150.82)),
-            trailing: Text('14/05/2025'),
-          ),
-          Divider(),
-
-          ListTile(
-            title: Text('Depósito'),
-            subtitle: Text(currencyFormatter.format(150.82)),
-            trailing: Text('14/05/2025'),
-          ),
+          TransactionList(),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text('Nova transação'),
-        onPressed: () {
-          Navigator.pushNamed(context, '/new-transaction');
-        },
       ),
     );
   }

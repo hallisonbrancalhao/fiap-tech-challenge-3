@@ -14,6 +14,19 @@ class TransactionForm extends StatefulWidget {
 class _TransactionFormState extends State<TransactionForm> {
   final _formKey = GlobalKey<FormState>();
 
+  // void _uploadImage(File file) async {
+  //   try {
+  //     String fileName = file.path.split('/').last;
+
+  //     var storageRef = FirebaseStorage.instance.ref('uploads/$fileName');
+  //     await storageRef.putFile(file);
+
+  //     var url = await storageRef.getDownloadURL();
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  // }
+
   void _createTransaction() {
     if (_formKey.currentState!.validate()) {
       print('criar transação');
