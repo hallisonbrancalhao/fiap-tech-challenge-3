@@ -37,10 +37,22 @@ class AuthRepositoryImpl extends AuthRepository {
       },
       (data) async {
         UserCredential userCredentials = data;
+
+        if (userCredentials.user == null || userCredentials.user?.uid == null) {
+          return Left('User not found');
+        }
+
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
+
+        UserEntity user = UserEntity(
+          uid: userCredentials.user!.uid,
+          username: userCredentials.user!.displayName ?? '',
+          email: userCredentials.user!.email ?? '',
+        );
+
         sharedPreferences.setString('token', userCredentials.user?.uid ?? '');
-        return Right(userCredentials);
+        return Right(user);
       },
     );
   }
@@ -65,8 +77,9 @@ class AuthRepositoryImpl extends AuthRepository {
         }
 
         final user = UserEntity(
-          email: firebaseUser.email ?? '',
+          uid: firebaseUser.uid,
           username: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
         );
         return Right(user);
       },
