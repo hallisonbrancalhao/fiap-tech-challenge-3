@@ -52,19 +52,8 @@ class BasicAppButton extends StatelessWidget {
   Widget _initial(BuildContext context) {
     final effectiveBackgroundColor = backgroundColor ?? Colors.white;
     final effectiveTextColor = textColor ?? Colors.blue;
-    final effectiveShadowColor =
-        shadowColor ?? const Color(0xff3461FD).withOpacity(0.8);
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: effectiveShadowColor,
-            offset: const Offset(0, 5),
-            blurRadius: 17,
-          ),
-        ],
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(16)),
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(

@@ -1,13 +1,19 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:tech_challenge_3/firebase_options.dart';
+import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
+import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
 import 'package:tech_challenge_3/service_locator.dart';
-import 'package:tech_challenge_3/core/routes/app_routes.dart';
-import 'package:tech_challenge_3/presentation/auth/pages/custom_signin.dart';
-import 'package:tech_challenge_3/presentation/auth/pages/custom_signup.dart';
-import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 
-void main() {
+import 'core/routes/app_routes.dart';
+import 'presentation/home/pages/home.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarBrightness: Brightness.light,
@@ -23,12 +29,16 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.bottom],
+    );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.home,
       routes: {
-        AppRoutes.login: (context) => CustomSigninPage(),
-        AppRoutes.signup: (context) => CustomSignupPage(),
+        AppRoutes.login: (context) => SigninPage(),
+        AppRoutes.signup: (context) => SignupPage(),
         AppRoutes.home: (context) => const HomePage(),
       },
     );

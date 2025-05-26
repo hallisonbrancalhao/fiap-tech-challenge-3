@@ -1,10 +1,6 @@
 import 'package:dartz/dartz.dart';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tech_challenge_3/core/constants/api_urls.dart';
-import 'package:tech_challenge_3/core/network/dio_client.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../service_locator.dart';
 import '../models/signin_req_params.dart';
 import '../models/signup_req_params.dart';
 
@@ -18,45 +14,44 @@ class AuthApiServiceImpl extends AuthApiService {
   @override
   Future<Either> signup(SignupReqParams signupReq) async {
     try {
-      var response = await sl<DioClient>().post(
-        ApiUrls.register,
-        data: signupReq.toMap(),
-      );
-
-      return Right(response);
-    } on DioException catch (e) {
-      return Left(e.response!.data['message']);
+      UserCredential createdUser = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: signupReq.email,
+            password: signupReq.password,
+          );
+      await createdUser.user?.updateDisplayName(signupReq.username);
+      await createdUser.user?.reload();
+      return Right(createdUser);
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message);
     }
   }
 
   @override
   Future<Either> getUser() async {
     try {
-      SharedPreferences sharedPreferences =
-          await SharedPreferences.getInstance();
-      var token = sharedPreferences.getString('token');
-      var response = await sl<DioClient>().get(
-        ApiUrls.userProfile,
-        options: Options(headers: {'Authorization': 'Bearer $token '}),
-      );
-
-      return Right(response);
-    } on DioException catch (e) {
-      return Left(e.response!.data['message']);
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user?.uid != null) {
+        return Right(user);
+      } else {
+        return Left('No user found');
+      }
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message);
     }
   }
 
   @override
   Future<Either> signin(SigninReqParams signinReq) async {
     try {
-      var response = await sl<DioClient>().post(
-        ApiUrls.login,
-        data: signinReq.toMap(),
-      );
-
-      return Right(response);
-    } on DioException catch (e) {
-      return Left(e.response!.data['message']);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: signinReq.email,
+            password: signinReq.password,
+          );
+      return Right(userCredential);
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message);
     }
   }
 }
