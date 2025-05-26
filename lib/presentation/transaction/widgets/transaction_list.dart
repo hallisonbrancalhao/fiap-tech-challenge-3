@@ -10,6 +10,7 @@ class TransactionList extends StatelessWidget {
     locale: 'pt_BR',
     decimalDigits: 2,
   );
+  static DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
   static List<dynamic> transactions = [
     {
@@ -48,7 +49,7 @@ class TransactionList extends StatelessWidget {
           return ListTile(
             title: Text(transaction['type']),
             subtitle: Text(currencyFormatter.format(transaction['value'])),
-            trailing: Text(transaction['createdAt'].toString()),
+            trailing: Text(dateFormatter.format(transaction['createdAt'])),
             onTap: () {
               Navigator.pushNamed(context, AppRoutes.updateTransaction);
             },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class DatePicker extends StatefulWidget {
   const DatePicker({super.key});
@@ -8,7 +9,7 @@ class DatePicker extends StatefulWidget {
 }
 
 class _DatePickerState extends State<DatePicker> {
-  // final dateFormatter = DateFormat('dd/MM/yyyy', 'pt_BR');
+  final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
   DateTime? selectedDate;
 
@@ -32,7 +33,7 @@ class _DatePickerState extends State<DatePicker> {
       icon: Icon(Icons.calendar_month),
       label:
           selectedDate != null
-              ? Text(selectedDate.toString())
+              ? Text(dateFormatter.format(selectedDate!))
               : Text('Data da transação'),
     );
   }

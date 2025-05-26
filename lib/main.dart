@@ -1,3 +1,4 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -40,8 +41,13 @@ class MainApp extends StatelessWidget {
     );
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [Locale('pt')],
       theme: AppTheme.appTheme,
-      initialRoute: AppRoutes.home,
+      initialRoute: AppRoutes.transactions,
       routes: {
         AppRoutes.login: (context) => SigninPage(),
         AppRoutes.signup: (context) => SignupPage(),
