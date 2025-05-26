@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:tech_challenge_3/presentation/transaction/widgets/transaction_list.dart';
 import 'package:tech_challenge_3/presentation/transaction/widgets/transaction_list_filter.dart';
 
+import 'package:tech_challenge_3/core/routes/app_routes.dart';
+
 class TransactionsScreen extends StatelessWidget {
   const TransactionsScreen({super.key});
 
@@ -14,7 +16,7 @@ class TransactionsScreen extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pushNamed(context, '/new-transaction');
+              Navigator.pushNamed(context, AppRoutes.newTransaction);
             },
             child: Text('Nova transação'),
           ),

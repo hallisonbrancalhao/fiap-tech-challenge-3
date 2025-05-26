@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import 'package:tech_challenge_3/core/routes/app_routes.dart';
+
 class TransactionList extends StatelessWidget {
   const TransactionList({super.key});
 
@@ -48,7 +50,7 @@ class TransactionList extends StatelessWidget {
             subtitle: Text(currencyFormatter.format(transaction['value'])),
             trailing: Text(transaction['createdAt'].toString()),
             onTap: () {
-              Navigator.pushNamed(context, '/update-transaction');
+              Navigator.pushNamed(context, AppRoutes.updateTransaction);
             },
           );
         }),
