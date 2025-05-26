@@ -32,14 +32,15 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: AppTheme.appTheme,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.transactions,
       routes: {
         AppRoutes.login: (context) => CustomSigninPage(),
         AppRoutes.signup: (context) => CustomSignupPage(),
         AppRoutes.home: (context) => const HomePage(),
         AppRoutes.transactions: (context) => const TransactionsScreen(),
         AppRoutes.newTransaction: (context) => const NewTransactionScreen(),
-        AppRoutes.updateTransaction: (context) => const UpdateTransaction(),
+        AppRoutes.updateTransaction:
+            (context) => const UpdateTransactionScreen(),
       },
     );
   }
