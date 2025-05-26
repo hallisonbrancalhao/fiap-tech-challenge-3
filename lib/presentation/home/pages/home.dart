@@ -78,7 +78,7 @@ class HomePage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(32),
       child: BasicAppButton(
-        title: 'Logout',
+        title: 'Sair',
         onPressed: () {
           context.read<ButtonStateCubit>().excute(usecase: sl<LogoutUseCase>());
         },

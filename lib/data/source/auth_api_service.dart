@@ -19,6 +19,8 @@ class AuthApiServiceImpl extends AuthApiService {
             email: signupReq.email,
             password: signupReq.password,
           );
+      await createdUser.user?.updateDisplayName(signupReq.username);
+      await createdUser.user?.reload();
       return Right(createdUser);
     } on FirebaseAuthException catch (e) {
       return Left(e.message);
@@ -29,7 +31,7 @@ class AuthApiServiceImpl extends AuthApiService {
   Future<Either> getUser() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
+      if (user?.uid != null) {
         return Right(user);
       } else {
         return Left('No user found');

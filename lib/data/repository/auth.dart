@@ -38,12 +38,13 @@ class AuthRepositoryImpl extends AuthRepository {
       (data) async {
         UserCredential userCredentials = data;
 
-        if (userCredentials.user == null || userCredentials.user?.uid == null) {
-          return Left('User not found');
-        }
-
         SharedPreferences sharedPreferences =
             await SharedPreferences.getInstance();
+
+        if (userCredentials.user?.email == null ||
+            userCredentials.user?.uid == null) {
+          return Left('User not found');
+        }
 
         UserEntity user = UserEntity(
           uid: userCredentials.user!.uid,
@@ -71,11 +72,6 @@ class AuthRepositoryImpl extends AuthRepository {
       },
       (data) {
         final firebaseUser = data as User;
-
-        if (firebaseUser.email == null || firebaseUser.displayName == null) {
-          return Left('User not found');
-        }
-
         final user = UserEntity(
           uid: firebaseUser.uid,
           username: firebaseUser.displayName ?? '',
