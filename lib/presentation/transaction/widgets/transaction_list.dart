@@ -1,61 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-import 'package:tech_challenge_3/core/routes/app_routes.dart';
+import 'package:tech_challenge_3/presentation/transaction/widgets/transaction_item.dart';
 
 class TransactionList extends StatelessWidget {
-  const TransactionList({super.key});
+  const TransactionList({super.key, required this.transactions});
 
-  static NumberFormat currencyFormatter = NumberFormat.simpleCurrency(
-    locale: 'pt_BR',
-    decimalDigits: 2,
-  );
-  static DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
-
-  static List<dynamic> transactions = [
-    {
-      'id': 1,
-      'type': 'depósito',
-      'value': 6452,
-      'createdAt': DateTime.now(),
-      'userId': 1,
-    },
-    {
-      'id': 1,
-      'type': 'saque',
-      'value': 235,
-      'createdAt': DateTime.now(),
-      'userId': 1,
-    },
-    {
-      'id': 1,
-      'type': 'transferência',
-      'value': 79.99,
-      'createdAt': DateTime.now(),
-      'userId': 1,
-    },
-  ];
+  final List<dynamic> transactions;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-          child: Text('Maio', style: TextStyle(fontWeight: FontWeight.w600)),
-        ),
-        ...transactions.map((transaction) {
-          return ListTile(
-            title: Text(transaction['type']),
-            subtitle: Text(currencyFormatter.format(transaction['value'])),
-            trailing: Text(dateFormatter.format(transaction['createdAt'])),
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.updateTransaction);
-            },
-          );
-        }),
-      ],
+    return SliverList.separated(
+      itemCount: transactions.length,
+      itemBuilder: (BuildContext context, int index) {
+        return TransactionItem(transaction: transactions[index]);
+      },
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
     );
   }
 }
