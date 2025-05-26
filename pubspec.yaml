@@ -19,6 +19,8 @@ dependencies:
   shared_preferences:
   file_selector: ^1.0.3
   intl: ^0.20.2
+  firebase_core: ^3.13.1
+  firebase_auth: ^5.5.4
 
 dev_dependencies:
   flutter_test:
