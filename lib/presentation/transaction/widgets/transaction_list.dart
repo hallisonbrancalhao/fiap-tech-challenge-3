@@ -9,28 +9,49 @@ class TransactionList extends StatelessWidget {
     decimalDigits: 2,
   );
 
+  static List<dynamic> transactions = [
+    {
+      'id': 1,
+      'type': 'depósito',
+      'value': 6452,
+      'createdAt': DateTime.now(),
+      'userId': 1,
+    },
+    {
+      'id': 1,
+      'type': 'saque',
+      'value': 235,
+      'createdAt': DateTime.now(),
+      'userId': 1,
+    },
+    {
+      'id': 1,
+      'type': 'transferência',
+      'value': 79.99,
+      'createdAt': DateTime.now(),
+      'userId': 1,
+    },
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ListTile(
-          title: Text('Depósito'),
-          subtitle: Text(currencyFormatter.format(150.82)),
-          trailing: Text('14/05/2025'),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+          child: Text('Maio', style: TextStyle(fontWeight: FontWeight.w600)),
         ),
-        Divider(),
-        ListTile(
-          title: Text('Depósito'),
-          subtitle: Text(currencyFormatter.format(150.82)),
-          trailing: Text('14/05/2025'),
-        ),
-        Divider(),
-
-        ListTile(
-          title: Text('Depósito'),
-          subtitle: Text(currencyFormatter.format(150.82)),
-          trailing: Text('14/05/2025'),
-        ),
+        ...transactions.map((transaction) {
+          return ListTile(
+            title: Text(transaction['type']),
+            subtitle: Text(currencyFormatter.format(transaction['value'])),
+            trailing: Text(transaction['createdAt'].toString()),
+            onTap: () {
+              Navigator.pushNamed(context, '/update-transaction');
+            },
+          );
+        }),
       ],
     );
   }

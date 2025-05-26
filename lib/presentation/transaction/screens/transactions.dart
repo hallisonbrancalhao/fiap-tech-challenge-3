@@ -20,14 +20,22 @@ class TransactionsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: TransactionListFilter(),
-          ),
-          TransactionList(),
-        ],
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 56),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 24, 12, 32),
+              child: TransactionListFilter(),
+            ),
+            TransactionList(),
+            SizedBox(height: 32),
+            TransactionList(),
+            SizedBox(height: 32),
+            TransactionList(),
+          ],
+        ),
       ),
     );
   }

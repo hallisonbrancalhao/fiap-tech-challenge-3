@@ -8,7 +8,7 @@ class UpdateTransaction extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nova transação')),
+      appBar: AppBar(title: const Text('Editar transação')),
       extendBody: true,
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 48),
