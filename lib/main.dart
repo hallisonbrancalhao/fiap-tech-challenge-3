@@ -2,11 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tech_challenge_3/firebase_options.dart';
+import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
+import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
 import 'core/routes/app_routes.dart';
-import 'presentation/auth/pages/custom_signin.dart';
-import 'presentation/auth/pages/custom_signup.dart';
 import 'presentation/home/pages/home.dart';
 
 void main() async {
@@ -37,8 +37,8 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.home,
       routes: {
-        AppRoutes.login: (context) => CustomSigninPage(),
-        AppRoutes.signup: (context) => CustomSignupPage(),
+        AppRoutes.login: (context) => SigninPage(),
+        AppRoutes.signup: (context) => SignupPage(),
         AppRoutes.home: (context) => const HomePage(),
       },
     );

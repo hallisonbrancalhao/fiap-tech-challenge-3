@@ -4,17 +4,32 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/common/widgets/button/basic_app_button.dart';
+import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
 import 'package:tech_challenge_3/data/models/signin_req_params.dart';
 import 'package:tech_challenge_3/domain/usecases/signin.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
 import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
-class SigninPage extends StatelessWidget {
-  SigninPage({super.key});
+class SigninPage extends StatefulWidget {
+  const SigninPage({super.key});
 
-  final TextEditingController _emailCon = TextEditingController();
-  final TextEditingController _passwordCon = TextEditingController();
+  @override
+  State<SigninPage> createState() => _SigninPageState();
+}
+
+class _SigninPageState extends State<SigninPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailCon = TextEditingController();
+  final _passwordCon = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _emailCon.dispose();
+    _passwordCon.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,21 +50,27 @@ class SigninPage extends StatelessWidget {
             }
           },
           child: SafeArea(
-            minimum: const EdgeInsets.only(top: 100, right: 16, left: 16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _signin(),
-                const SizedBox(height: 50),
-                _emailField(),
-                const SizedBox(height: 20),
-                _password(),
-                const SizedBox(height: 60),
-                _createAccountButton(context),
-                const SizedBox(height: 20),
-                _signupText(context),
-              ],
+            minimum: const EdgeInsets.only(top: 30, right: 16, left: 16),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _signin(),
+                    const SizedBox(height: 50),
+                    _emailField(),
+                    const SizedBox(height: 20),
+                    _password(),
+                    const SizedBox(height: 40),
+                    _createAccountButton(context),
+                    const SizedBox(height: 20),
+                    _signupText(context),
+                  ],
+                ),
+              ),
             ),
           ),
         ),
@@ -58,27 +79,58 @@ class SigninPage extends StatelessWidget {
   }
 
   Widget _signin() {
-    return const Text(
-      'Sign In',
-      style: TextStyle(
-        color: Color(0xff2A4ECA),
-        fontWeight: FontWeight.bold,
-        fontSize: 32,
-      ),
+    return Column(
+      children: [
+        Image.asset('assets/images/image_login.png', height: 160),
+        const SizedBox(height: 32),
+        const Text(
+          'Entrar',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 
   Widget _emailField() {
-    return TextField(
+    return TextFormField(
       controller: _emailCon,
-      decoration: const InputDecoration(hintText: 'Email'),
+      decoration: const InputDecoration(
+        labelText: 'E-mail',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor insira seu e-mail';
+        }
+        return null;
+      },
     );
   }
 
   Widget _password() {
-    return TextField(
+    return TextFormField(
       controller: _passwordCon,
-      decoration: const InputDecoration(hintText: 'Password'),
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        labelText: 'Senha',
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor insira sua senha';
+        }
+        return null;
+      },
     );
   }
 
@@ -86,15 +138,26 @@ class SigninPage extends StatelessWidget {
     return Builder(
       builder: (context) {
         return BasicAppButton(
-          title: 'Login',
+          title: 'Entrar',
+          backgroundColor: AppTheme.appTheme.primaryColor,
+          textColor: Colors.white,
           onPressed: () {
-            context.read<ButtonStateCubit>().excute(
-              usecase: sl<SigninUseCase>(),
-              params: SigninReqParams(
-                email: _emailCon.text,
-                password: _passwordCon.text,
-              ),
-            );
+            if (_formKey.currentState!.validate()) {
+              context.read<ButtonStateCubit>().excute(
+                usecase: sl<SigninUseCase>(),
+                params: SigninReqParams(
+                  email: _emailCon.text,
+                  password: _passwordCon.text,
+                ),
+              );
+            } else {
+              var snackBar = const SnackBar(
+                content: Text(
+                  'Por favor, preencha todos os campos corretamente.',
+                ),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
           },
         );
       },
@@ -105,16 +168,10 @@ class SigninPage extends StatelessWidget {
     return Text.rich(
       TextSpan(
         children: [
-          const TextSpan(
-            text: "Don't you have account?",
-            style: TextStyle(
-              color: Color(0xff3B4054),
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          const TextSpan(text: "Não tem uma conta? "),
           TextSpan(
-            text: ' Sign Up',
-            style: const TextStyle(
+            text: 'Criar conta',
+            style: TextStyle(
               color: Color(0xff3461FD),
               fontWeight: FontWeight.w500,
             ),

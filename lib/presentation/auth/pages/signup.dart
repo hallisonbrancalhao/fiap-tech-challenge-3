@@ -4,18 +4,34 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/common/widgets/button/basic_app_button.dart';
+import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
 import 'package:tech_challenge_3/data/models/signup_req_params.dart';
 import 'package:tech_challenge_3/domain/usecases/signup.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
 import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
-class SignupPage extends StatelessWidget {
-  SignupPage({super.key});
+class SignupPage extends StatefulWidget {
+  const SignupPage({super.key});
 
+  @override
+  State<SignupPage> createState() => _SignupPageState();
+}
+
+class _SignupPageState extends State<SignupPage> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameCon = TextEditingController();
   final TextEditingController _emailCon = TextEditingController();
   final TextEditingController _passwordCon = TextEditingController();
+  bool _obscurePassword = true;
+
+  @override
+  void dispose() {
+    _usernameCon.dispose();
+    _emailCon.dispose();
+    _passwordCon.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,24 +52,28 @@ class SignupPage extends StatelessWidget {
             }
           },
           child: SafeArea(
-            minimum: const EdgeInsets.only(top: 100, right: 16, left: 16),
+            minimum: const EdgeInsets.only(top: 30, right: 16, left: 16),
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _signup(),
-                  const SizedBox(height: 50),
-                  _userNameField(),
-                  const SizedBox(height: 20),
-                  _emailField(),
-                  const SizedBox(height: 20),
-                  _password(),
-                  const SizedBox(height: 60),
-                  _createAccountButton(context),
-                  const SizedBox(height: 20),
-                  _signinText(context),
-                ],
+              padding: const EdgeInsets.all(16),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _signup(),
+                    const SizedBox(height: 40),
+                    _userNameField(),
+                    const SizedBox(height: 20),
+                    _emailField(),
+                    const SizedBox(height: 20),
+                    _password(),
+                    const SizedBox(height: 20),
+                    _createAccountButton(context),
+                    const SizedBox(height: 20),
+                    _signinText(context),
+                  ],
+                ),
               ),
             ),
           ),
@@ -63,34 +83,74 @@ class SignupPage extends StatelessWidget {
   }
 
   Widget _signup() {
-    return const Text(
-      'Sign Up',
-      style: TextStyle(
-        color: Color(0xff2A4ECA),
-        fontWeight: FontWeight.bold,
-        fontSize: 32,
-      ),
+    return Column(
+      children: [
+        Image.asset('assets/images/image_login.png', height: 160),
+        const SizedBox(height: 32),
+        const Text(
+          'Criar conta',
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 
   Widget _userNameField() {
-    return TextField(
+    return TextFormField(
       controller: _usernameCon,
-      decoration: const InputDecoration(hintText: 'Username'),
+      decoration: const InputDecoration(
+        labelText: 'Nome de usuário',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor insira seu nome de usuário';
+        }
+        return null;
+      },
     );
   }
 
   Widget _emailField() {
-    return TextField(
+    return TextFormField(
       controller: _emailCon,
-      decoration: const InputDecoration(hintText: 'Email'),
+      decoration: const InputDecoration(
+        labelText: 'E-mail',
+        border: OutlineInputBorder(),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor insira seu e-mail';
+        }
+        return null;
+      },
     );
   }
 
   Widget _password() {
-    return TextField(
+    return TextFormField(
       controller: _passwordCon,
-      decoration: const InputDecoration(hintText: 'Password'),
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        labelText: 'Senha',
+        border: const OutlineInputBorder(),
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Por favor insira uma senha';
+        }
+        return null;
+      },
     );
   }
 
@@ -98,16 +158,26 @@ class SignupPage extends StatelessWidget {
     return Builder(
       builder: (context) {
         return BasicAppButton(
-          title: 'Create Account',
+          title: 'Criar conta',
+          backgroundColor: AppTheme.appTheme.primaryColor,
+          textColor: Colors.white,
           onPressed: () {
-            context.read<ButtonStateCubit>().excute(
-              usecase: sl<SignupUseCase>(),
-              params: SignupReqParams(
-                email: _emailCon.text,
-                password: _passwordCon.text,
-                username: _usernameCon.text,
-              ),
-            );
+            if (_formKey.currentState!.validate()) {
+              context.read<ButtonStateCubit>().excute(
+                usecase: sl<SignupUseCase>(),
+                params: SignupReqParams(
+                  username: _usernameCon.text,
+                  email: _emailCon.text,
+                  password: _passwordCon.text,
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Por favor, preencha todos os campos'),
+                ),
+              );
+            }
           },
         );
       },
@@ -119,14 +189,14 @@ class SignupPage extends StatelessWidget {
       TextSpan(
         children: [
           const TextSpan(
-            text: 'Do you have account?',
+            text: 'Já possui uma conta?',
             style: TextStyle(
               color: Color(0xff3B4054),
               fontWeight: FontWeight.w500,
             ),
           ),
           TextSpan(
-            text: ' Sign In',
+            text: ' Entrar',
             style: const TextStyle(
               color: Color(0xff3461FD),
               fontWeight: FontWeight.w500,
