@@ -84,6 +84,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Either> logout() async {
+    await sl<AuthApiService>().logout();
     return await sl<AuthLocalService>().logout();
   }
 }

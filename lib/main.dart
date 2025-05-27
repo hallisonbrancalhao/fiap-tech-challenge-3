@@ -1,10 +1,17 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tech_challenge_3/common/bloc/auth/auth_state.dart';
+import 'package:tech_challenge_3/common/bloc/auth/auth_state_cubit.dart';
+import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/domain/entities/transaction.dart';
 import 'package:tech_challenge_3/firebase_options.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
+import 'package:tech_challenge_3/presentation/home/bloc/user_display_cubit.dart';
+import 'package:tech_challenge_3/presentation/splash/spash_screen.dart';
+import 'package:tech_challenge_3/presentation/transactions/bloc/transactions_display_cubit.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/add_transaction.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/statement_page.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/transaction_detail_page.dart';
@@ -25,7 +32,19 @@ void main() async {
     ),
   );
   setupServiceLocator();
-  runApp(const MainApp());
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => UserDisplayCubit()..displayUser()),
+        BlocProvider(
+          create: (context) => TransactionsDisplayCubit()..fetchTransactions(),
+        ),
+        BlocProvider(create: (context) => ButtonStateCubit()),
+        BlocProvider(create: (context) => AuthStateCubit()..appStarted()),
+      ],
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatelessWidget {
@@ -37,21 +56,31 @@ class MainApp extends StatelessWidget {
       SystemUiMode.manual,
       overlays: [SystemUiOverlay.bottom],
     );
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: AppRoutes.home,
-      routes: {
-        AppRoutes.login: (context) => SigninPage(),
-        AppRoutes.signup: (context) => SignupPage(),
-        AppRoutes.home: (context) => const HomePage(),
-        AppRoutes.createTransaction: (context) => const CreateTransactionPage(),
-        AppRoutes.listTransactions: (context) => const StatementPage(),
-        AppRoutes.transactionDetail:
-            (context) => TransactionDetailPage(
-              transaction:
-                  ModalRoute.of(context)?.settings.arguments
-                      as TransactionEntity,
-            ),
+    return BlocBuilder<AuthStateCubit, AuthState>(
+      builder: (context, state) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: switch (state) {
+            AppInitialState() => const SplashScreen(),
+            Authenticated() => const HomePage(),
+            UnAuthenticated() => SigninPage(),
+            _ => const SplashScreen(),
+          },
+          routes: {
+            AppRoutes.login: (context) => SigninPage(),
+            AppRoutes.signup: (context) => SignupPage(),
+            AppRoutes.home: (context) => HomePage(),
+            AppRoutes.createTransaction:
+                (context) => const CreateTransactionPage(),
+            AppRoutes.listTransactions: (context) => const StatementPage(),
+            AppRoutes.transactionDetail:
+                (context) => TransactionDetailPage(
+                  transaction:
+                      ModalRoute.of(context)?.settings.arguments
+                          as TransactionEntity,
+                ),
+          },
+        );
       },
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state.dart';
+import 'package:tech_challenge_3/core/routes/app_routes.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/logout.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
 import 'package:tech_challenge_3/presentation/home/bloc/user_display_cubit.dart';
@@ -20,19 +21,23 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => UserDisplayCubit()..displayUser()),
+        BlocProvider(create: (context) => UserDisplayCubit()..displayUser()),
         BlocProvider(
-          create: (_) => TransactionsDisplayCubit()..fetchTransactions(),
+          create: (context) => TransactionsDisplayCubit()..fetchTransactions(),
         ),
-        BlocProvider(create: (_) => ButtonStateCubit()),
+        BlocProvider(create: (context) => ButtonStateCubit()),
       ],
       child: BlocListener<ButtonStateCubit, ButtonState>(
         listener: (context, state) {
           if (state is ButtonSuccessState) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => SignupPage()),
+              MaterialPageRoute(builder: (context) => const SignupPage()),
             );
+          }
+          if (state is ButtonFailureState) {
+            var snackBar = SnackBar(content: Text(state.errorMessage));
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           }
         },
         child: Scaffold(
@@ -50,10 +55,12 @@ class HomePage extends StatelessWidget {
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout),
-                onPressed:
-                    () => context.read<ButtonStateCubit>().excute(
-                      usecase: sl<LogoutUseCase>(),
-                    ),
+                onPressed: () {
+                  context.read<ButtonStateCubit>().excute(
+                    usecase: sl<LogoutUseCase>(),
+                  );
+                  Navigator.pushReplacementNamed(context, AppRoutes.login);
+                },
               ),
             ],
           ),
