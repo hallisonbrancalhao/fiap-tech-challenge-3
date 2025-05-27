@@ -6,6 +6,6 @@ import 'package:tech_challenge_3/service_locator.dart';
 class GetTransactionUseCase implements UseCase<Either, dynamic> {
   @override
   Future<Either> call({dynamic param}) async {
-    return sl<TransactionsRepository>().addTransaction(param);
+    return sl<TransactionsRepository>().getTransactions();
   }
 }

@@ -26,7 +26,7 @@ void setupServiceLocator() {
 
   // Repositories
   sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
-  sl.registerSingleton<TransactionsRepository>(TransactionsRepoitoryImpl());
+  sl.registerSingleton<TransactionsRepository>(TransactionsRepositoryImpl());
 
   // Usecases
   sl.registerSingleton<SignupUseCase>(SignupUseCase());

@@ -21,7 +21,7 @@ class TransactionEntity {
     return {
       'uid': uid,
       'userUid': userUid,
-      'type': type,
+      'type': type.name,
       'description': description,
       'amount': amount,
       'date': date.toIso8601String(),

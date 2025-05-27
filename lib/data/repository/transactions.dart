@@ -5,7 +5,7 @@ import 'package:tech_challenge_3/data/source/transactions_api_service.dart';
 import 'package:tech_challenge_3/domain/repository/transactions.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
-class TransactionsRepoitoryImpl extends TransactionsRepository {
+class TransactionsRepositoryImpl extends TransactionsRepository {
   @override
   Future<Either> addTransaction(TransactionCreateDto transaction) async {
     Either result = await sl<TransactionsApiService>().addTransaction(
