@@ -6,7 +6,7 @@ import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/common/widgets/button/basic_app_button.dart';
 import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
 import 'package:tech_challenge_3/data/models/signup_req_params.dart';
-import 'package:tech_challenge_3/domain/usecases/signup.dart';
+import 'package:tech_challenge_3/domain/usecases/auth/signup.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
 import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 import 'package:tech_challenge_3/service_locator.dart';

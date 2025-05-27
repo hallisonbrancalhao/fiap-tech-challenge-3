@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/common/widgets/button/basic_app_button.dart';
 import 'package:tech_challenge_3/domain/entities/user.dart';
-import 'package:tech_challenge_3/domain/usecases/logout.dart';
+import 'package:tech_challenge_3/domain/usecases/auth/logout.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
 import 'package:tech_challenge_3/presentation/home/bloc/user_display_cubit.dart';
 import 'package:tech_challenge_3/presentation/home/bloc/user_display_state.dart';

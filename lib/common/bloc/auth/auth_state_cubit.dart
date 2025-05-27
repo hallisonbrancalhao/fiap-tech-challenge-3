@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tech_challenge_3/common/bloc/auth/auth_state.dart';
-import 'package:tech_challenge_3/domain/usecases/is_logged_in.dart';
+import 'package:tech_challenge_3/domain/usecases/auth/is_logged_in.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
 class AuthStateCubit extends Cubit<AuthState> {
