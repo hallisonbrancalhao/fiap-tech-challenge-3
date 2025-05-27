@@ -252,7 +252,7 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
       decoration: _inputDecoration(
         'Valor (Ex: 150,00)',
         prefixText: 'R\$ ',
-        hint: '0,00',
+        hintText: '0,00',
       ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       inputFormatters: [_currencyFormatter],
@@ -310,11 +310,14 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
   InputDecoration _inputDecoration(
     String labelText, {
     String? prefixText,
-    String? hint,
+    String? hintText,
   }) {
     return InputDecoration(
       labelText: labelText,
-      hint: hint != null ? Text(hint, style: TextStyle(fontSize: 16)) : null,
+      hint:
+          hintText != null
+              ? Text(hintText, style: TextStyle(fontSize: 16))
+              : null,
       prefixText: prefixText,
       filled: true,
       fillColor: Colors.white,
