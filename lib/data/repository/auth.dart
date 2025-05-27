@@ -84,7 +84,11 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Either> logout() async {
-    await sl<AuthApiService>().logout();
+    try {
+      await sl<AuthApiService>().logout();
+    } catch (error) {
+      return Left('Failed to logout from API: $error');
+    }
     return await sl<AuthLocalService>().logout();
   }
 }

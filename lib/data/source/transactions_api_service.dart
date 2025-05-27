@@ -77,17 +77,10 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
     TransactionUpdateDto transaction,
   ) async {
     try {
-      final transactionToUpdate = TransactionUpdateDto(
-        type: transaction.type,
-        description: transaction.description,
-        amount: transaction.amount,
-        date: transaction.date,
-      );
-
       await FirebaseFirestore.instance
           .collection('transactions')
           .doc(id)
-          .update(transactionToUpdate.toJson());
+          .update(transaction.toJson());
 
       return Right(null);
     } catch (e) {
