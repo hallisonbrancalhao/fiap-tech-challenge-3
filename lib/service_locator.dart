@@ -13,6 +13,8 @@ import 'package:tech_challenge_3/domain/usecases/auth/logout.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/signin.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/signup.dart';
 import 'package:tech_challenge_3/domain/usecases/transactions/create_transaction.dart';
+import 'package:tech_challenge_3/domain/usecases/transactions/get_transactions.dart';
+import 'package:tech_challenge_3/domain/usecases/transactions/upload_transaction_attachment.dart';
 
 final sl = GetIt.instance;
 
@@ -35,4 +37,8 @@ void setupServiceLocator() {
   sl.registerSingleton<LogoutUseCase>(LogoutUseCase());
   sl.registerSingleton<SigninUseCase>(SigninUseCase());
   sl.registerSingleton<CreateTransactionUseCase>(CreateTransactionUseCase());
+  sl.registerSingleton<GetTransactionsUseCase>(GetTransactionsUseCase());
+  sl.registerSingleton<UploadTransactionAttachmentUseCase>(
+    UploadTransactionAttachmentUseCase(),
+  );
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
@@ -64,5 +66,17 @@ class TransactionsRepositoryImpl extends TransactionsRepository {
         return Right(data);
       },
     );
+  }
+
+  @override
+  Future<Either<String, String>> uploadAttachment(
+    String transactionId,
+    File imageFile,
+  ) async {
+    final result = await sl<TransactionsApiService>().uploadAttachment(
+      transactionId,
+      imageFile,
+    );
+    return result.fold((error) => Left(error), (url) => Right(url));
   }
 }
