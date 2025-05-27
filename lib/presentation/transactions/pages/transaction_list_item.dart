@@ -137,16 +137,29 @@ class _TransactionListItemState extends State<TransactionListItem> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      transaction.description.isNotEmpty
-                          ? transaction.description
-                          : transactionTypeToString(transaction.type),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    Row(
+                      spacing: 8.0,
+                      children: [
+                        Text(
+                          transactionTypeToString(transaction.type),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        Text('-'),
+                        Flexible(
+                          child: Text(
+                            transaction.description,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -159,7 +172,7 @@ class _TransactionListItemState extends State<TransactionListItem> {
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 16),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 mainAxisAlignment: MainAxisAlignment.center,

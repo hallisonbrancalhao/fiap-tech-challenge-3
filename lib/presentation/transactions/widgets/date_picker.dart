@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class DatePicker extends StatefulWidget {
-  const DatePicker({super.key});
+class DatePicker extends StatelessWidget {
+  const DatePicker({super.key, required this.onSelect, this.selectedDate});
 
-  @override
-  State<DatePicker> createState() => _DatePickerState();
-}
+  final void Function(DateTime? value) onSelect;
+  final DateTime? selectedDate;
 
-class _DatePickerState extends State<DatePicker> {
-  final DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
+  static DateFormat dateFormatter = DateFormat('dd/MM/yyyy');
 
-  DateTime? selectedDate;
-
-  Future<void> _selectDate() async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -21,15 +17,13 @@ class _DatePickerState extends State<DatePicker> {
       lastDate: DateTime.now(),
     );
 
-    setState(() {
-      selectedDate = pickedDate;
-    });
+    onSelect(pickedDate);
   }
 
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
-      onPressed: _selectDate,
+      onPressed: () => _selectDate(context),
       icon: Icon(Icons.calendar_month),
       label:
           selectedDate != null

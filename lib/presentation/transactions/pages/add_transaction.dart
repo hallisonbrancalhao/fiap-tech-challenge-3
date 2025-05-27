@@ -11,6 +11,7 @@ import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/domain/enums/transaction_type_enum.dart';
 import 'package:tech_challenge_3/domain/usecases/transactions/create_transaction.dart';
 import 'package:tech_challenge_3/service_locator.dart';
+import 'package:tech_challenge_3/utils/currency_formatter.dart';
 
 class CreateTransactionPage extends StatefulWidget {
   static const String routeName = '/add-transaction';
@@ -243,10 +244,18 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
   }
 
   Widget _buildAmountField() {
+    final CurrencyTextInputFormatter _currencyFormatter =
+        CurrencyTextInputFormatter();
+
     return TextFormField(
       controller: _amountController,
-      decoration: _inputDecoration('Valor (Ex: 150,00)', prefixText: 'R\$ '),
+      decoration: _inputDecoration(
+        'Valor (Ex: 150,00)',
+        prefixText: 'R\$ ',
+        hint: '0,00',
+      ),
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      inputFormatters: [_currencyFormatter],
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Por favor, insira um valor.';
@@ -298,9 +307,14 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
     );
   }
 
-  InputDecoration _inputDecoration(String labelText, {String? prefixText}) {
+  InputDecoration _inputDecoration(
+    String labelText, {
+    String? prefixText,
+    String? hint,
+  }) {
     return InputDecoration(
       labelText: labelText,
+      hint: hint != null ? Text(hint, style: TextStyle(fontSize: 16)) : null,
       prefixText: prefixText,
       filled: true,
       fillColor: Colors.white,

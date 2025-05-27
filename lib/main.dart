@@ -11,10 +11,8 @@ import 'package:tech_challenge_3/service_locator.dart';
 
 import 'package:tech_challenge_3/presentation/transactions/bloc/transactions_display_cubit.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/transaction_detail_page.dart';
-import 'package:tech_challenge_3/presentation/transaction/screens/update_transaction.dart';
-import 'package:tech_challenge_3/presentation/transaction/screens/new_transaction.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/add_transaction.dart';
-import 'package:tech_challenge_3/presentation/transaction/screens/transactions.dart';
+import 'package:tech_challenge_3/presentation/transactions/pages/statement_page.dart';
 import 'package:tech_challenge_3/presentation/home/bloc/user_display_cubit.dart';
 import 'package:tech_challenge_3/presentation/splash/spash_screen.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
@@ -87,17 +85,13 @@ class MainApp extends StatelessWidget {
             AppRoutes.home: (context) => HomePage(),
             AppRoutes.createTransaction:
                 (context) => const CreateTransactionPage(),
-            // AppRoutes.listTransactions: (context) => const StatementPage(),
+            AppRoutes.listTransactions: (context) => const StatementPage(),
             AppRoutes.transactionDetail:
                 (context) => TransactionDetailPage(
                   transaction:
                       ModalRoute.of(context)?.settings.arguments
                           as TransactionEntity,
                 ),
-            AppRoutes.transactions: (context) => const TransactionsScreen(),
-            AppRoutes.newTransaction: (context) => const NewTransactionScreen(),
-            AppRoutes.updateTransaction:
-                (context) => const UpdateTransactionScreen(),
           },
         );
       },
