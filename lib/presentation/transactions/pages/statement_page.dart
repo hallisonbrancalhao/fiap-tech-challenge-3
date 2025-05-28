@@ -1,10 +1,10 @@
-// lib/presentation/statement/pages/statement_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
 import 'package:tech_challenge_3/core/routes/app_routes.dart';
 import 'package:tech_challenge_3/presentation/transactions/bloc/transactions_display_cubit.dart';
-import 'package:tech_challenge_3/presentation/transactions/pages/transaction_list_item.dart';
+import 'package:tech_challenge_3/presentation/transactions/widgets/transaction_list.dart';
+import 'package:tech_challenge_3/presentation/transactions/widgets/transaction_list_filter.dart';
 
 class StatementPage extends StatefulWidget {
   static const String routeName = AppRoutes.listTransactions;
@@ -48,14 +48,6 @@ class _StatementPageState extends State<StatementPage> {
                 ),
               );
             } else if (state is TransactionsDisplayLoaded) {
-              if (state.transactions.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'Nenhuma transação encontrada.',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                );
-              }
               return RefreshIndicator(
                 onRefresh:
                     () =>
@@ -63,13 +55,19 @@ class _StatementPageState extends State<StatementPage> {
                             .read<TransactionsDisplayCubit>()
                             .fetchTransactions(),
                 color: AppTheme.appTheme.primaryColor,
-                child: ListView.builder(
+                child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  itemCount: state.transactions.length,
-                  itemBuilder: (context, index) {
-                    final transaction = state.transactions[index];
-                    return TransactionListItem(transaction: transaction);
-                  },
+                  child: CustomScrollView(
+                    slivers: [
+                      SliverToBoxAdapter(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 24, 12, 32),
+                          child: TransactionListFilter(),
+                        ),
+                      ),
+                      TransactionList(transactions: state.transactions),
+                    ],
+                  ),
                 ),
               );
             } else if (state is TransactionsDisplayError) {

@@ -17,11 +17,14 @@ dependencies:
   dartz:
   logger:
   shared_preferences:
+  file_selector: ^1.0.3
   firebase_core: ^3.13.1
   firebase_auth: ^5.5.4
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
   cloud_firestore: ^5.6.8
   flutter_svg: ^2.1.0
-  intl: ^0.20.2
   provider: ^6.1.5
   firebase_storage:
   image_picker:
