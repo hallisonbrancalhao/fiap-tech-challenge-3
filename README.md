@@ -2,6 +2,9 @@
 
 Aplicativo de gerenciamento financeiro desenvolvido para o Tech Challenge 3 da FIAP.
 
+## Vídeo demonstrativo
+O vídeo demonstrativo se encontra no link: https://www.youtube.com/watch?v=K68NQv2fqoU
+
 ## Requisitos
 
 - Flutter SDK (versão 3.19.0 ou superior)
