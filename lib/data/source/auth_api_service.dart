@@ -8,6 +8,7 @@ abstract class AuthApiService {
   Future<Either> signup(SignupReqParams signupReq);
   Future<Either> getUser();
   Future<Either> signin(SigninReqParams signinReq);
+  Future<Either> logout();
 }
 
 class AuthApiServiceImpl extends AuthApiService {
@@ -50,6 +51,16 @@ class AuthApiServiceImpl extends AuthApiService {
             password: signinReq.password,
           );
       return Right(userCredential);
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message);
+    }
+  }
+
+  @override
+  Future<Either> logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      return Right(null);
     } on FirebaseAuthException catch (e) {
       return Left(e.message);
     }
