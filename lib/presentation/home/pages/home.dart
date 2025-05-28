@@ -27,19 +27,31 @@ class HomePage extends StatelessWidget {
         ),
         BlocProvider(create: (context) => ButtonStateCubit()),
       ],
-      child: BlocListener<ButtonStateCubit, ButtonState>(
-        listener: (context, state) {
-          if (state is ButtonSuccessState) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const SignupPage()),
-            );
-          }
-          if (state is ButtonFailureState) {
-            var snackBar = SnackBar(content: Text(state.errorMessage));
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }
-        },
+      child: MultiBlocListener(
+        listeners: [
+          BlocListener<ButtonStateCubit, ButtonState>(
+            listener: (context, state) {
+              if (state is ButtonSuccessState) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SignupPage()),
+                );
+              }
+              if (state is ButtonFailureState) {
+                var snackBar = SnackBar(content: Text(state.errorMessage));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }
+            },
+          ),
+          BlocListener<TransactionsDisplayCubit, TransactionsDisplayState>(
+            listener: (context, state) {
+              if (state is TransactionsDisplayError) {
+                var snackBar = SnackBar(content: Text(state.errorMessage));
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              }
+            },
+          ),
+        ],
         child: Scaffold(
           appBar: AppBar(
             title: Row(
@@ -116,10 +128,19 @@ class HomePage extends StatelessWidget {
                           },
                         ),
                         const SizedBox(height: 16),
-                        BlocBuilder<
-                          TransactionsDisplayCubit,
-                          TransactionsDisplayState
-                        >(
+                        BlocConsumer(
+                          listener:
+                              (context, state) =>
+                                  state is TransactionsDisplayError
+                                      ? ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(state.errorMessage),
+                                        ),
+                                      )
+                                      : null,
+                          bloc: context.read<TransactionsDisplayCubit>(),
                           builder: (context, state) {
                             if (state is TransactionsDisplayLoaded) {
                               final total = calculateTotal(state.transactions);

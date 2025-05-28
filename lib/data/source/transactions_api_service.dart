@@ -36,7 +36,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
 
       final List<TransactionEntity> transactions =
           snapshot.docs.map((doc) {
-            final data = {'id': doc.id, ...doc.data()};
+            final data = doc.data();
             return TransactionEntity.fromJson(data);
           }).toList();
       return Right(transactions);
@@ -64,6 +64,8 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
       final docRef = await FirebaseFirestore.instance
           .collection('transactions')
           .add(transactionEntity.toJson());
+
+      await docRef.update({'id': docRef.id});
 
       return Right(docRef.id);
     } catch (e) {

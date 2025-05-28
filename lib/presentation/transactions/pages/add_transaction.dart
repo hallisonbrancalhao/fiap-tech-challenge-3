@@ -7,13 +7,15 @@ import 'package:tech_challenge_3/common/bloc/button/button_state.dart';
 import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 import 'package:tech_challenge_3/common/widgets/button/basic_app_button.dart';
 import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
+import 'package:tech_challenge_3/core/routes/app_routes.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/domain/enums/transaction_type_enum.dart';
 import 'package:tech_challenge_3/domain/usecases/transactions/create_transaction.dart';
+import 'package:tech_challenge_3/presentation/transactions/bloc/transactions_display_cubit.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
 class CreateTransactionPage extends StatefulWidget {
-  static const String routeName = '/add-transaction';
+  static const String routeName = AppRoutes.createTransaction;
 
   const CreateTransactionPage({super.key});
 
@@ -63,10 +65,10 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
     }
   }
 
-  void _submitTransaction(BuildContext blocContext) {
+  void _submitTransaction(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       if (_selectedType == null) {
-        ScaffoldMessenger.of(blocContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Por favor, selecione o tipo de transação.'),
           ),
@@ -78,7 +80,7 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
       final amount = double.tryParse(amountText);
 
       if (amount == null || amount <= 0) {
-        ScaffoldMessenger.of(blocContext).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Valor inválido ou não positivo.')),
         );
         return;
@@ -91,12 +93,12 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
         date: _selectedDate,
       );
 
-      blocContext.read<ButtonStateCubit>().excute(
+      context.read<ButtonStateCubit>().excute(
         usecase: sl<CreateTransactionUseCase>(),
         params: transactionDto,
       );
     } else {
-      ScaffoldMessenger.of(blocContext).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Por favor, preencha todos os campos corretamente.'),
         ),
@@ -116,93 +118,90 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
         backgroundColor: AppTheme.appTheme.primaryColor,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: BlocProvider(
-        create: (context) => ButtonStateCubit(),
-        child: BlocListener<ButtonStateCubit, ButtonState>(
-          listener: (context, state) {
-            if (state is ButtonSuccessState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Transação criada com sucesso!')),
-              );
-              if (Navigator.canPop(context)) {
-                Navigator.of(context).pop();
-              }
+      body: BlocListener<ButtonStateCubit, ButtonState>(
+        listener: (context, state) {
+          if (state is ButtonSuccessState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Transação criada com sucesso!')),
+            );
+            // Atualiza a lista de transações ao voltar
+            context.read<TransactionsDisplayCubit>().fetchTransactions();
+            if (Navigator.canPop(context)) {
+              Navigator.of(context).pop();
             }
-            if (state is ButtonFailureState) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Erro ao criar transação: ${state.errorMessage}',
+          }
+          if (state is ButtonFailureState) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao criar transação: ${state.errorMessage}'),
+              ),
+            );
+          }
+        },
+        child: Stack(
+          children: [
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: SvgPicture.asset(
+                'assets/images/pixels_top.svg',
+                fit: BoxFit.contain,
+                alignment: Alignment.topCenter,
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: SvgPicture.asset(
+                'assets/images/pixels_bottom.svg',
+                fit: BoxFit.contain,
+                alignment: Alignment.bottomCenter,
+              ),
+            ),
+            Positioned(
+              bottom: 20,
+              left: 20,
+              height: 150,
+              child: SvgPicture.asset(
+                'assets/images/woman.svg',
+                fit: BoxFit.contain,
+              ),
+            ),
+            SafeArea(
+              minimum: const EdgeInsets.only(top: 10, right: 16, left: 16),
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 8.0,
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const SizedBox(
+                        height: 10,
+                      ), // Reduzido para compensar SafeArea.minimum
+                      _buildDropdownType(),
+                      const SizedBox(height: 20),
+                      _buildDescriptionField(),
+                      const SizedBox(height: 20),
+                      _buildAmountField(),
+                      const SizedBox(height: 20),
+                      _buildDateField(context),
+                      const SizedBox(height: 30),
+                      _buildSubmitButton(), // O botão agora usa BlocBuilder
+                      const SizedBox(
+                        height: 180,
+                      ), // Espaço para a imagem da mulher
+                    ],
                   ),
                 ),
-              );
-            }
-          },
-          child: Stack(
-            children: [
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: SvgPicture.asset(
-                  'assets/images/pixels_top.svg',
-                  fit: BoxFit.contain,
-                  alignment: Alignment.topCenter,
-                ),
               ),
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: SvgPicture.asset(
-                  'assets/images/pixels_bottom.svg',
-                  fit: BoxFit.contain,
-                  alignment: Alignment.bottomCenter,
-                ),
-              ),
-              Positioned(
-                bottom: 20,
-                left: 20,
-                height: 150,
-                child: SvgPicture.asset(
-                  'assets/images/woman.svg',
-                  fit: BoxFit.contain,
-                ),
-              ),
-              SafeArea(
-                minimum: const EdgeInsets.only(top: 10, right: 16, left: 16),
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0,
-                    vertical: 8.0,
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        const SizedBox(
-                          height: 10,
-                        ), // Reduzido para compensar SafeArea.minimum
-                        _buildDropdownType(),
-                        const SizedBox(height: 20),
-                        _buildDescriptionField(),
-                        const SizedBox(height: 20),
-                        _buildAmountField(),
-                        const SizedBox(height: 20),
-                        _buildDateField(context),
-                        const SizedBox(height: 30),
-                        _buildSubmitButton(), // O botão agora usa BlocBuilder
-                        const SizedBox(
-                          height: 180,
-                        ), // Espaço para a imagem da mulher
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -7,12 +7,10 @@ import 'package:tech_challenge_3/service_locator.dart';
 part 'transactions_display_state.dart';
 
 class TransactionsDisplayCubit extends Cubit<TransactionsDisplayState> {
-  final GetTransactionsUseCase _getTransactionsUseCase;
+  final _getTransactionsUseCase = sl<GetTransactionsUseCase>();
 
   TransactionsDisplayCubit({GetTransactionsUseCase? getTransactionsUseCase})
-    : _getTransactionsUseCase =
-          getTransactionsUseCase ?? sl<GetTransactionsUseCase>(),
-      super(TransactionsDisplayInitial());
+    : super(TransactionsDisplayInitial());
 
   Future<void> fetchTransactions() async {
     emit(TransactionsDisplayLoading());

@@ -30,7 +30,7 @@ class _TransactionListItemState extends State<TransactionListItem> {
         type == TransactionType.investment;
   }
 
-  Future<void> _pickAndUploadImage() async {
+  Future<void> _pickAndUploadImage(BuildContext context) async {
     final ImagePicker picker = ImagePicker();
     final XFile? imageXFile = await picker.pickImage(
       source: ImageSource.gallery,
@@ -207,7 +207,7 @@ class _TransactionListItemState extends State<TransactionListItem> {
                                     ),
                                   );
                                 }
-                                : _pickAndUploadImage,
+                                : () => _pickAndUploadImage(context),
                       ),
                 ],
               ),
