@@ -313,10 +313,8 @@ class _CreateTransactionPageState extends State<CreateTransactionPage> {
   }) {
     return InputDecoration(
       labelText: labelText,
-      hint:
-          hintText != null
-              ? Text(hintText, style: TextStyle(fontSize: 16))
-              : null,
+      hintText: hintText,
+      hintStyle: TextStyle(fontSize: 16),
       prefixText: prefixText,
       filled: true,
       fillColor: Colors.white,
