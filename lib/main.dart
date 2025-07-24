@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
 import 'package:tech_challenge_3/core/routes/app_routes.dart';
@@ -13,7 +14,7 @@ import 'package:tech_challenge_3/presentation/transactions/bloc/transactions_dis
 import 'package:tech_challenge_3/presentation/transactions/pages/transaction_detail_page.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/add_transaction.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/statement_page.dart';
-import 'package:tech_challenge_3/presentation/home/bloc/user_display_cubit.dart';
+
 import 'package:tech_challenge_3/presentation/splash/spash_screen.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
@@ -38,16 +39,18 @@ void main() async {
   );
   setupServiceLocator();
   runApp(
-    MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => UserDisplayCubit()..displayUser()),
-        BlocProvider(
-          create: (context) => TransactionsDisplayCubit()..fetchTransactions(),
-        ),
-        BlocProvider(create: (context) => ButtonStateCubit()),
-        BlocProvider(create: (context) => AuthStateCubit()..appStarted()),
-      ],
-      child: const MainApp(),
+    ProviderScope(
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create:
+                (context) => TransactionsDisplayCubit()..fetchTransactions(),
+          ),
+          BlocProvider(create: (context) => ButtonStateCubit()),
+          BlocProvider(create: (context) => AuthStateCubit()..appStarted()),
+        ],
+        child: const MainApp(),
+      ),
     ),
   );
 }

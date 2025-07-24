@@ -6,9 +6,9 @@ import 'package:tech_challenge_3/common/bloc/button/button_state.dart';
 import 'package:tech_challenge_3/core/routes/app_routes.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/logout.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
-import 'package:tech_challenge_3/presentation/home/bloc/user_display_cubit.dart';
-import 'package:tech_challenge_3/presentation/home/bloc/user_display_state.dart';
+
 import 'package:tech_challenge_3/presentation/home/pages/transaction_chart.dart';
+import 'package:tech_challenge_3/presentation/home/widgets/user_card.dart';
 import 'package:tech_challenge_3/presentation/transactions/bloc/transactions_display_cubit.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/add_transaction.dart';
 import 'package:tech_challenge_3/presentation/transactions/pages/statement_page.dart';
@@ -21,7 +21,6 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => UserDisplayCubit()..displayUser()),
         BlocProvider(
           create: (context) => TransactionsDisplayCubit()..fetchTransactions(),
         ),
@@ -106,27 +105,7 @@ class HomePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        BlocBuilder<UserDisplayCubit, UserDisplayState>(
-                          builder: (context, state) {
-                            if (state is UserLoaded) {
-                              return ListTile(
-                                contentPadding: EdgeInsets.zero,
-                                leading: const CircleAvatar(
-                                  child: Icon(Icons.person),
-                                ),
-                                title: Text(
-                                  'Olá, ${state.userEntity.username}!',
-                                  style:
-                                      Theme.of(context).textTheme.titleMedium,
-                                ),
-                                subtitle: Text(state.userEntity.email),
-                              );
-                            }
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          },
-                        ),
+                        const UserCard(),
                         const SizedBox(height: 16),
                         BlocConsumer(
                           listener:

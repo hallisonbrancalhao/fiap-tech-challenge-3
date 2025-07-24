@@ -29,6 +29,7 @@ dependencies:
   firebase_storage:
   image_picker:
   fl_chart:
+  flutter_riverpod: ^2.6.1
 
 dev_dependencies:
   flutter_test:
