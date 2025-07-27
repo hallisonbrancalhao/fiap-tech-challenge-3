@@ -8,8 +8,12 @@ import 'package:tech_challenge_3/core/configs/theme/app_theme.dart';
 import 'package:tech_challenge_3/data/models/signin_req_params.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/signin.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signup.dart';
+import 'package:tech_challenge_3/presentation/auth/widgets/validate_pin_dialog.dart';
+import 'package:tech_challenge_3/presentation/auth/widgets/create_pin_dialog.dart';
+import 'package:tech_challenge_3/presentation/auth/widgets/pin_input.dart';
 import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 import 'package:tech_challenge_3/service_locator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SigninPage extends StatefulWidget {
   const SigninPage({super.key});
@@ -39,10 +43,8 @@ class _SigninPageState extends State<SigninPage> {
         child: BlocListener<ButtonStateCubit, ButtonState>(
           listener: (context, state) {
             if (state is ButtonSuccessState) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
-              );
+              // TODO: remove comment to add the pin validation to success signin
+              _checkPinAndNavigate(context);
             }
             if (state is ButtonFailureState) {
               var snackBar = SnackBar(content: Text(state.errorMessage));
@@ -186,6 +188,190 @@ class _SigninPageState extends State<SigninPage> {
           ),
         ],
       ),
+    );
+  }
+
+  // Verificar PIN e navegar
+  Future<void> _checkPinAndNavigate(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPin = prefs.getString('user_pin');
+    final hasPin = savedPin != null;
+
+    // Debug: Verificar se PIN existe
+    print('=== DEBUG PIN VALIDATION ===');
+    print('Saved PIN: $savedPin');
+    print('Has PIN: $hasPin');
+    print('============================');
+
+    // Sempre mostrar dialog de PIN
+    print('Mostrando dialog de validação de PIN');
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => ValidatePinDialog(
+            onPinValidated: (pin) {
+              print('PIN validado com sucesso: $pin');
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+            onCancel: () {
+              // Voltar para tela de login
+              print('Usuário cancelou validação de PIN');
+              Navigator.pop(context);
+            },
+            onForgotPin: () {
+              // Implementar reset de PIN
+              print('Usuário esqueceu PIN');
+              Navigator.pop(context);
+              _showForgotPinDialog(context);
+            },
+          ),
+    );
+  }
+
+  // Dialog para "Esqueci meu PIN"
+  void _showForgotPinDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Redefinir PIN'),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Como você gostaria de redefinir seu PIN?'),
+                SizedBox(height: 16),
+                Text('• Email: Receber código por email'),
+                Text('• Novo PIN: Configurar um novo PIN'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showEmailResetDialog(context);
+                },
+                child: const Text('Por Email'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showNewPinDialog(context);
+                },
+                child: const Text('Novo PIN'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancelar'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  // Dialog para reset por email
+  void _showEmailResetDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Reset por Email'),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Um código será enviado para seu email.'),
+                SizedBox(height: 8),
+                Text(
+                  'Use o código: 1234',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showEmailCodeDialog(context);
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+    );
+  }
+
+  // Dialog para inserir código do email
+  void _showEmailCodeDialog(BuildContext context) {
+    String? errorText;
+    showDialog(
+      context: context,
+      builder:
+          (context) => StatefulBuilder(
+            builder:
+                (context, setState) => AlertDialog(
+                  title: const Text('Digite o código'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('Digite o código enviado para seu email:'),
+                      const SizedBox(height: 16),
+                      PinInput(
+                        onCompleted: (code) {
+                          if (code == '1234') {
+                            Navigator.pop(context);
+                            _showNewPinDialog(context);
+                          } else {
+                            setState(() {
+                              errorText = 'Código incorreto. Use: 1234';
+                            });
+                          }
+                        },
+                      ),
+                      if (errorText != null) ...[
+                        const SizedBox(height: 8),
+                        Text(
+                          errorText!,
+                          style: const TextStyle(color: Colors.red),
+                        ),
+                      ],
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                  ],
+                ),
+          ),
+    );
+  }
+
+  // Dialog para configurar novo PIN
+  void _showNewPinDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder:
+          (context) => CreatePinDialog(
+            onPinCreated: (pin) async {
+              // Salvar novo PIN
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setString('user_pin', pin);
+              await prefs.setString(
+                'pin_created_at',
+                DateTime.now().toIso8601String(),
+              );
+
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomePage()),
+              );
+            },
+          ),
     );
   }
 }
