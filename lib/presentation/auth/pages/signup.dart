@@ -10,6 +10,8 @@ import 'package:tech_challenge_3/domain/usecases/auth/signup.dart';
 import 'package:tech_challenge_3/presentation/auth/pages/signin.dart';
 import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 import 'package:tech_challenge_3/service_locator.dart';
+import 'package:tech_challenge_3/presentation/auth/widgets/pin_input.dart';
+import 'package:tech_challenge_3/presentation/auth/widgets/create_pin_dialog.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -41,9 +43,21 @@ class _SignupPageState extends State<SignupPage> {
         child: BlocListener<ButtonStateCubit, ButtonState>(
           listener: (context, state) {
             if (state is ButtonSuccessState) {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomePage()),
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder:
+                    (context) => CreatePinDialog(
+                      onPinCreated: (pin) {
+                        // TODO: Salvar PIN no Firestore após integração de segurança
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ),
+                        );
+                      },
+                    ),
               );
             }
             if (state is ButtonFailureState) {
