@@ -1,12 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tech_challenge_3/domain/source/local_service.dart';
 
-abstract class AuthLocalService {
-  Future<bool> isLoggedIn();
-  Future<Either> logout();
-}
-
-class AuthLocalServiceImpl extends AuthLocalService {
+class LocalServiceImpl implements LocalService {
   @override
   Future<bool> isLoggedIn() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();

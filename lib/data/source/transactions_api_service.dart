@@ -4,22 +4,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:tech_challenge_3/data/models/transaction.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
 import 'package:tech_challenge_3/domain/entities/transaction.dart';
+import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 
-abstract class TransactionsApiService {
-  Future<Either> getTransactions();
-  Future<Either> addTransaction(TransactionCreateDto transaction);
-  Future<Either> updateTransaction(String id, TransactionUpdateDto transaction);
-  Future<Either> deleteTransaction(String id);
-  Future<Either<String, String>> uploadAttachment(
-    String transactionId,
-    File imageFile,
-  );
-}
-
-class TransactionsApiServiceImpl extends TransactionsApiService {
+class TransactionsApiServiceImpl implements TransactionsService {
   @override
   Future<Either> getTransactions() async {
     final User? user = FirebaseAuth.instance.currentUser;
@@ -35,10 +26,9 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
               .get();
 
       final List<TransactionEntity> transactions =
-          snapshot.docs.map((doc) {
-            final data = doc.data();
-            return TransactionEntity.fromJson(data);
-          }).toList();
+          snapshot.docs
+              .map((doc) => TransactionModel.fromJson(doc.data()).toEntity())
+              .toList();
       return Right(transactions);
     } catch (e) {
       return Left('Failed to fetch transactions: $e');
@@ -53,7 +43,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
     }
 
     try {
-      final transactionEntity = TransactionEntity(
+      final transactionModel = TransactionModel(
         userUid: user.uid,
         type: transaction.type,
         description: transaction.description,
@@ -63,7 +53,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
 
       final docRef = await FirebaseFirestore.instance
           .collection('transactions')
-          .add(transactionEntity.toJson());
+          .add(transactionModel.toJson());
 
       await docRef.update({'id': docRef.id});
 

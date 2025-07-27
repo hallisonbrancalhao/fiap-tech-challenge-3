@@ -1,17 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:tech_challenge_3/domain/source/auth_service.dart';
 
 import '../models/signin_req_params.dart';
 import '../models/signup_req_params.dart';
 
-abstract class AuthApiService {
-  Future<Either> signup(SignupReqParams signupReq);
-  Future<Either> getUser();
-  Future<Either> signin(SigninReqParams signinReq);
-  Future<Either> logout();
-}
-
-class AuthApiServiceImpl extends AuthApiService {
+class AuthServiceImpl implements AuthService {
   @override
   Future<Either> signup(SignupReqParams signupReq) async {
     try {
