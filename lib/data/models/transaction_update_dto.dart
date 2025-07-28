@@ -1,3 +1,5 @@
+// lib/data/models/transaction_update_dto.dart
+
 import 'package:tech_challenge_3/domain/enums/transaction_type_enum.dart';
 
 class TransactionUpdateDto {
@@ -5,8 +7,15 @@ class TransactionUpdateDto {
   final String? description;
   final double? amount;
   final DateTime? date;
+  final String? attachmentUrl;
 
-  TransactionUpdateDto({this.description, this.amount, this.date, this.type});
+  TransactionUpdateDto({
+    this.description,
+    this.amount,
+    this.date,
+    this.type,
+    this.attachmentUrl, 
+  });
 
   Map<String, dynamic> toJson() {
     return {
@@ -14,6 +23,7 @@ class TransactionUpdateDto {
       'description': description,
       'amount': amount,
       'date': date?.toIso8601String(),
+      'attachmentUrl': attachmentUrl, 
     };
   }
 }

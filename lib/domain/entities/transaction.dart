@@ -1,4 +1,8 @@
+// lib/domain/entities/transaction.dart
+
 import 'package:tech_challenge_3/domain/enums/transaction_type_enum.dart';
+import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
+import 'package:tech_challenge_3/data/models/transaction_create_dto.dart'; // Mantenha este import
 
 class TransactionEntity {
   final String? id;
@@ -40,6 +44,35 @@ class TransactionEntity {
       amount: (json['amount'] as num).toDouble(),
       date: DateTime.parse(json['date'] as String),
       attachmentUrl: json['attachmentUrl'] as String?,
+    );
+  }
+
+  factory TransactionEntity.fromCreateDto(TransactionCreateDto dto, {required String userUid}) {
+    return TransactionEntity(
+      id: null,
+      userUid: userUid,
+      type: TransactionType.fromString(dto.type.name),
+      description: dto.description,
+      amount: dto.amount,
+      date: dto.date,
+      attachmentUrl: null, 
+    );
+  }
+
+ 
+  factory TransactionEntity.fromUpdateDto(
+      TransactionUpdateDto dto, {
+      required String id,
+      required String userUid,
+    }) {
+    return TransactionEntity(
+      id: id,
+      userUid: userUid, 
+      type: dto.type != null ? TransactionType.fromString(dto.type!.name) : TransactionType.deposit, 
+      description: dto.description ?? '', // Fornecer um padrão para campos nulos
+      amount: dto.amount ?? 0.0, // Fornecer um padrão para campos nulos
+      date: dto.date ?? DateTime.now(), // Fornecer um padrão para campos nulos
+      attachmentUrl: dto.attachmentUrl, // Pode ser nulo
     );
   }
 }

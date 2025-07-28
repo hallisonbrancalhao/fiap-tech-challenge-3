@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
 import 'package:tech_challenge_3/domain/entities/transaction.dart';
+import 'package:tech_challenge_3/data/models/transaction_model.dart'; 
 
 abstract class TransactionsApiService {
   Future<Either> getTransactions();
@@ -37,7 +38,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
       final List<TransactionEntity> transactions =
           snapshot.docs.map((doc) {
             final data = doc.data();
-            return TransactionEntity.fromJson(data);
+            return TransactionModel.fromMap(data).toEntity();
           }).toList();
       return Right(transactions);
     } catch (e) {
