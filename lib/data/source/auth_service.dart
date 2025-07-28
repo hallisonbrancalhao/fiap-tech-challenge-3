@@ -1,13 +1,13 @@
-import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:tech_challenge_3/domain/source/auth_service.dart';
+import 'package:dartz/dartz.dart';
 
+import 'package:tech_challenge_3/domain/source/auth_service.dart';
 import '../models/signin_req_params.dart';
 import '../models/signup_req_params.dart';
 
 class AuthServiceImpl implements AuthService {
   @override
-  Future<Either<UserCredential, String>> signup(
+  Future<Either<UserCredential, String>> signUp(
     SignupReqParams signupReq,
   ) async {
     try {
@@ -25,7 +25,7 @@ class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<Either<UserCredential, String>> signin(
+  Future<Either<UserCredential, String>> signIn(
     SigninReqParams signinReq,
   ) async {
     try {
@@ -51,7 +51,7 @@ class AuthServiceImpl implements AuthService {
   }
 
   @override
-  Future<Either<void, String>> logout() async {
+  Future<Either<void, String>> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
       return Left(null);

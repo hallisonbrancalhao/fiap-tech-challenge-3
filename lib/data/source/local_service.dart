@@ -1,5 +1,6 @@
-import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dartz/dartz.dart';
+
 import 'package:tech_challenge_3/domain/source/local_service.dart';
 
 class LocalServiceImpl implements LocalService {

@@ -1,12 +1,12 @@
 import 'package:get_it/get_it.dart';
 import 'package:tech_challenge_3/core/network/dio_client.dart';
-import 'package:tech_challenge_3/data/repository/auth.dart';
-import 'package:tech_challenge_3/data/repository/transactions.dart';
+import 'package:tech_challenge_3/data/repository/auth_repository.dart';
+import 'package:tech_challenge_3/data/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/data/source/auth_service.dart';
 import 'package:tech_challenge_3/data/source/local_service.dart';
 import 'package:tech_challenge_3/data/source/transactions_api_service.dart';
-import 'package:tech_challenge_3/domain/repository/auth.dart';
-import 'package:tech_challenge_3/domain/repository/transactions.dart';
+import 'package:tech_challenge_3/domain/repository/auth_repository.dart';
+import 'package:tech_challenge_3/domain/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/domain/source/auth_service.dart';
 import 'package:tech_challenge_3/domain/source/local_service.dart';
 import 'package:tech_challenge_3/domain/source/transactions_service.dart';

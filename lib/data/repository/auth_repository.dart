@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tech_challenge_3/data/models/signin_req_params.dart';
 import 'package:tech_challenge_3/domain/entities/user.dart';
-import 'package:tech_challenge_3/domain/repository/auth.dart';
+import 'package:tech_challenge_3/domain/repository/auth_repository.dart';
 import 'package:tech_challenge_3/domain/source/auth_service.dart';
 import 'package:tech_challenge_3/domain/source/local_service.dart';
 import 'package:tech_challenge_3/service_locator.dart';
@@ -11,10 +11,10 @@ import '../models/signup_req_params.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   @override
-  Future<Either<UserCredential, String>> signup(
+  Future<Either<UserCredential, String>> signUp(
     SignupReqParams signupReq,
   ) async {
-    Either result = await sl<AuthService>().signup(signupReq);
+    Either result = await sl<AuthService>().signUp(signupReq);
     return result.fold(
       (data) async {
         UserCredential userCredentials = data;
@@ -28,8 +28,8 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<Either<UserEntity, String>> signin(SigninReqParams signinReq) async {
-    Either result = await sl<AuthService>().signin(signinReq);
+  Future<Either<UserEntity, String>> signIn(SigninReqParams signinReq) async {
+    Either result = await sl<AuthService>().signIn(signinReq);
     return result.fold(
       (data) async {
         UserCredential userCredentials = data;
@@ -77,9 +77,9 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<Either<void, String>> logout() async {
+  Future<Either<void, String>> signOut() async {
     try {
-      await sl<AuthService>().logout();
+      await sl<AuthService>().signOut();
       return Left(null);
     } catch (error) {
       return Right('Failed to logout from API: $error');

@@ -5,7 +5,7 @@ import 'package:tech_challenge_3/data/models/transaction.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
 import 'package:tech_challenge_3/domain/entities/transaction.dart';
-import 'package:tech_challenge_3/domain/repository/transactions.dart';
+import 'package:tech_challenge_3/domain/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
