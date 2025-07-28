@@ -33,7 +33,7 @@ void setupServiceLocator() {
   // Usecases
   sl.registerSingleton<SignupUseCase>(SignupUseCase());
   sl.registerSingleton<IsLoggedInUseCase>(IsLoggedInUseCase());
-  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
+  sl.registerLazySingleton<GetUserUseCase>(() => GetUserUseCase(sl()));
   sl.registerSingleton<LogoutUseCase>(LogoutUseCase());
   sl.registerSingleton<SigninUseCase>(SigninUseCase());
   sl.registerSingleton<CreateTransactionUseCase>(CreateTransactionUseCase());
