@@ -7,44 +7,40 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:tech_challenge_3/data/models/transaction.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
-import 'package:tech_challenge_3/domain/entities/transaction.dart';
 import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 
 class TransactionsApiServiceImpl implements TransactionsService {
   @override
-  Future<Either> getTransactions() async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return Left('User not authenticated');
-    }
-
+  Future<Either<List<TransactionModel>, Exception>> getTransactions(
+    userId,
+  ) async {
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance
               .collection('transactions')
-              .where('userUid', isEqualTo: user.uid)
+              .where('userUid', isEqualTo: userId)
               .get();
 
-      final List<TransactionEntity> transactions =
+      final List<TransactionModel> transactions =
           snapshot.docs
-              .map((doc) => TransactionModel.fromJson(doc.data()).toEntity())
+              .map(
+                (doc) =>
+                    TransactionModel.fromJson({...doc.data(), 'id': doc.id}),
+              )
               .toList();
-      return Right(transactions);
-    } catch (e) {
-      return Left('Failed to fetch transactions: $e');
+      return Left(transactions);
+    } on Exception catch (e) {
+      return Right(e);
     }
   }
 
   @override
-  Future<Either> addTransaction(TransactionCreateDto transaction) async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return Left('User not authenticated');
-    }
-
+  Future<Either<String, String>> addTransaction(
+    TransactionCreateDto transaction,
+  ) async {
     try {
       final transactionModel = TransactionModel(
-        userUid: user.uid,
+        userUid: transaction.userUid ?? '',
         type: transaction.type,
         description: transaction.description,
         amount: transaction.amount,
@@ -55,16 +51,14 @@ class TransactionsApiServiceImpl implements TransactionsService {
           .collection('transactions')
           .add(transactionModel.toJson());
 
-      await docRef.update({'id': docRef.id});
-
-      return Right(docRef.id);
+      return Left(docRef.id);
     } catch (e) {
-      return Left('Failed to add transaction: $e');
+      return Right('Failed to add transaction: $e');
     }
   }
 
   @override
-  Future<Either> updateTransaction(
+  Future<Either<void, String>> updateTransaction(
     String id,
     TransactionUpdateDto transaction,
   ) async {
@@ -74,22 +68,22 @@ class TransactionsApiServiceImpl implements TransactionsService {
           .doc(id)
           .update(transaction.toJson());
 
-      return Right(null);
+      return Left(null);
     } catch (e) {
-      return Left('Failed to update transaction: $e');
+      return Right('Failed to update transaction: $e');
     }
   }
 
   @override
-  Future<Either> deleteTransaction(String id) async {
+  Future<Either<void, String>> deleteTransaction(String id) async {
     try {
       await FirebaseFirestore.instance
           .collection('transactions')
           .doc(id)
           .delete();
-      return Right(null);
+      return Left(null);
     } catch (e) {
-      return Left('Failed to delete transaction: $e');
+      return Right('Failed to delete transaction: $e');
     }
   }
 
@@ -100,7 +94,7 @@ class TransactionsApiServiceImpl implements TransactionsService {
   ) async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      return Left('User not authenticated');
+      return Right('User not authenticated');
     }
 
     try {
@@ -120,11 +114,11 @@ class TransactionsApiServiceImpl implements TransactionsService {
           .doc(transactionId)
           .update({'attachmentUrl': downloadUrl});
 
-      return Right(downloadUrl);
+      return Left(downloadUrl);
     } on FirebaseException catch (e) {
-      return Left('Erro de Storage: ${e.code} - ${e.message}');
+      return Right('Erro de Storage: ${e.code} - ${e.message}');
     } catch (e) {
-      return Left('Falha ao enviar anexo: $e');
+      return Right('Falha ao enviar anexo: $e');
     }
   }
 }

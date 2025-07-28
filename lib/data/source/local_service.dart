@@ -15,9 +15,22 @@ class LocalServiceImpl implements LocalService {
   }
 
   @override
-  Future<Either> logout() async {
+  Future<Either> removeTokens() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.clear();
+    return const Right(true);
+  }
+
+  @override
+  Future<String?> getToken(String key) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString(key);
+  }
+
+  @override
+  Future<Either> setToken(String key, String token) async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    await sharedPreferences.setString(key, token);
     return const Right(true);
   }
 }

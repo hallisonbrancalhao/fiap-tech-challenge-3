@@ -1,6 +1,5 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_challenge_3/data/models/signin_req_params.dart';
 import 'package:tech_challenge_3/domain/entities/user.dart';
 import 'package:tech_challenge_3/domain/repository/auth.dart';
@@ -12,38 +11,32 @@ import '../models/signup_req_params.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   @override
-  Future<Either> signup(SignupReqParams signupReq) async {
+  Future<Either<UserCredential, String>> signup(
+    SignupReqParams signupReq,
+  ) async {
     Either result = await sl<AuthService>().signup(signupReq);
     return result.fold(
-      (error) {
-        return Left(error);
-      },
       (data) async {
         UserCredential userCredentials = data;
-        SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
-        sharedPreferences.setString('token', userCredentials.user?.uid ?? '');
-        return Right(userCredentials);
+
+        return Left(userCredentials);
+      },
+      (error) {
+        return Right(error);
       },
     );
   }
 
   @override
-  Future<Either> signin(SigninReqParams signinReq) async {
+  Future<Either<UserEntity, String>> signin(SigninReqParams signinReq) async {
     Either result = await sl<AuthService>().signin(signinReq);
     return result.fold(
-      (error) {
-        return Left(error);
-      },
       (data) async {
         UserCredential userCredentials = data;
 
-        SharedPreferences sharedPreferences =
-            await SharedPreferences.getInstance();
-
         if (userCredentials.user?.email == null ||
             userCredentials.user?.uid == null) {
-          return Left('User not found');
+          return Right('User not found');
         }
 
         UserEntity user = UserEntity(
@@ -52,10 +45,45 @@ class AuthRepositoryImpl extends AuthRepository {
           email: userCredentials.user!.email ?? '',
         );
 
-        sharedPreferences.setString('token', userCredentials.user?.uid ?? '');
-        return Right(user);
+        return Left(user);
+      },
+      (error) {
+        return Right(error);
       },
     );
+  }
+
+  @override
+  Future<Either<UserEntity?, String>> getUser() async {
+    Either result = await sl<AuthService>().getUser();
+    return result.fold(
+      (data) {
+        if (data == null) {
+          return Left(null);
+        }
+
+        final firebaseUser = data;
+        final user = UserEntity(
+          uid: firebaseUser.uid,
+          username: firebaseUser.displayName ?? '',
+          email: firebaseUser.email ?? '',
+        );
+        return Left(user);
+      },
+      (error) {
+        return Right(error);
+      },
+    );
+  }
+
+  @override
+  Future<Either<void, String>> logout() async {
+    try {
+      await sl<AuthService>().logout();
+      return Left(null);
+    } catch (error) {
+      return Right('Failed to logout from API: $error');
+    }
   }
 
   @override
@@ -64,31 +92,22 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<Either> getUser() async {
-    Either result = await sl<AuthService>().getUser();
-    return result.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        final firebaseUser = data as User;
-        final user = UserEntity(
-          uid: firebaseUser.uid,
-          username: firebaseUser.displayName ?? '',
-          email: firebaseUser.email ?? '',
-        );
-        return Right(user);
-      },
-    );
+  Future<Either<void, String>> removeTokensFromLocal() async {
+    try {
+      await sl<LocalService>().removeTokens();
+      return Left(null);
+    } catch (error) {
+      return Right('Failed to remove tokens from local storage: $error');
+    }
   }
 
   @override
-  Future<Either> logout() async {
+  Future<Either<void, String>> saveUserToken(String token) async {
     try {
-      await sl<AuthService>().logout();
+      await sl<LocalService>().setToken('token', token);
+      return Left(null);
     } catch (error) {
-      return Left('Failed to logout from API: $error');
+      return Right('Failed to save user token: $error');
     }
-    return await sl<LocalService>().logout();
   }
 }

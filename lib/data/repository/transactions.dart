@@ -1,16 +1,21 @@
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
+import 'package:tech_challenge_3/data/models/transaction.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
+import 'package:tech_challenge_3/domain/entities/transaction.dart';
 import 'package:tech_challenge_3/domain/repository/transactions.dart';
 import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
-class TransactionsRepositoryImpl extends TransactionsRepository {
+class TransactionsRepositoryImpl implements TransactionsRepository {
   @override
-  Future<Either> addTransaction(TransactionCreateDto transaction) async {
-    Either result = await sl<TransactionsService>().addTransaction(transaction);
+  Future<Either<String, String>> addTransaction(
+    TransactionCreateDto transaction,
+  ) async {
+    Either<String, String> result = await sl<TransactionsService>()
+        .addTransaction(transaction);
     return result.fold(
       (error) {
         return Left(error);
@@ -22,33 +27,32 @@ class TransactionsRepositoryImpl extends TransactionsRepository {
   }
 
   @override
-  Future<Either> deleteTransaction(String id) async {
+  Future<Either<void, String>> deleteTransaction(String id) async {
     Either result = await sl<TransactionsService>().deleteTransaction(id);
+    return result.fold((error) => Right(error), (data) => Left(null));
+  }
+
+  @override
+  Future<Either<List<TransactionEntity>, Exception>> getTransactions(
+    String userId,
+  ) async {
+    Either<List<TransactionModel>, Exception> result =
+        await sl<TransactionsService>().getTransactions(userId);
+
     return result.fold(
-      (error) {
-        return Left(error);
-      },
       (data) {
-        return Right(data);
+        final List<TransactionEntity> transactions =
+            data.map((model) => model.toEntity()).toList();
+        return Left(transactions);
+      },
+      (error) {
+        return Right(error);
       },
     );
   }
 
   @override
-  Future<Either> getTransactions() async {
-    Either result = await sl<TransactionsService>().getTransactions();
-    return result.fold(
-      (error) {
-        return Left(error);
-      },
-      (data) {
-        return Right(data);
-      },
-    );
-  }
-
-  @override
-  Future<Either> updateTransaction(
+  Future<Either<String, String>> updateTransaction(
     String id,
     TransactionUpdateDto transaction,
   ) async {
@@ -58,10 +62,10 @@ class TransactionsRepositoryImpl extends TransactionsRepository {
     );
     return result.fold(
       (error) {
-        return Left(error);
+        return Right(error);
       },
       (data) {
-        return Right(data);
+        return Left(data);
       },
     );
   }
@@ -75,6 +79,6 @@ class TransactionsRepositoryImpl extends TransactionsRepository {
       transactionId,
       imageFile,
     );
-    return result.fold((error) => Left(error), (url) => Right(url));
+    return result.fold((error) => Right(error), (url) => Left(url));
   }
 }

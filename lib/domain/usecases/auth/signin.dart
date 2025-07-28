@@ -7,6 +7,16 @@ import 'package:tech_challenge_3/service_locator.dart';
 class SigninUseCase implements UseCase<Either, SigninReqParams> {
   @override
   Future<Either> call({SigninReqParams? param}) async {
-    return sl<AuthRepository>().signin(param!);
+    final result = await sl<AuthRepository>().signin(param!);
+
+    return result.fold(
+      (data) async {
+        await sl<AuthRepository>().saveUserToken(data.uid);
+        return Left(data);
+      },
+      (error) {
+        return Right(error);
+      },
+    );
   }
 }

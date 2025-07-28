@@ -6,6 +6,17 @@ import 'package:tech_challenge_3/service_locator.dart';
 class LogoutUseCase implements UseCase<Either, dynamic> {
   @override
   Future<Either> call({param}) async {
-    return await sl<AuthRepository>().logout();
+    final authRepository = sl<AuthRepository>();
+    final result = await authRepository.logout();
+
+    return result.fold(
+      (data) async {
+        await authRepository.removeTokensFromLocal();
+        return Left(null);
+      },
+      (error) {
+        return Right(error);
+      },
+    );
   }
 }
