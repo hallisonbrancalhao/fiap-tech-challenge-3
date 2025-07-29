@@ -5,16 +5,20 @@ import 'package:tech_challenge_3/domain/entities/user.dart';
 import 'package:tech_challenge_3/domain/repository/auth_repository.dart';
 import 'package:tech_challenge_3/domain/source/auth_service.dart';
 import 'package:tech_challenge_3/domain/source/local_service.dart';
-import 'package:tech_challenge_3/service_locator.dart';
 
 import '../models/signup_req_params.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
+  final AuthService authService;
+  final LocalService localService;
+
+  AuthRepositoryImpl({required this.authService, required this.localService});
+
   @override
   Future<Either<String, UserCredential>> signUp(
     SignupReqParams signupReq,
   ) async {
-    Either result = await sl<AuthService>().signUp(signupReq);
+    Either result = await authService.signUp(signupReq);
     return result.fold(
       (error) {
         return Left(error);
@@ -28,7 +32,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Either<String, UserEntity>> signIn(SigninReqParams signinReq) async {
-    Either result = await sl<AuthService>().signIn(signinReq);
+    Either result = await authService.signIn(signinReq);
     return result.fold(
       (error) {
         return Left(error);
@@ -54,7 +58,7 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<Either<String, UserEntity?>> getUser() async {
-    Either result = await sl<AuthService>().getUser();
+    Either result = await authService.getUser();
     return result.fold(
       (error) {
         return Left(error);
@@ -78,7 +82,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<Either<String, void>> signOut() async {
     try {
-      await sl<AuthService>().signOut();
+      await authService.signOut();
       return Right(null);
     } catch (error) {
       return Left('Failed to logout from API: $error');
@@ -87,13 +91,13 @@ class AuthRepositoryImpl extends AuthRepository {
 
   @override
   Future<bool> isLoggedIn() async {
-    return await sl<LocalService>().isLoggedIn();
+    return await localService.isLoggedIn();
   }
 
   @override
   Future<Either<String, void>> removeTokensFromLocal() async {
     try {
-      await sl<LocalService>().removeTokens();
+      await localService.removeTokens();
       return Right(null);
     } catch (error) {
       return Left('Failed to remove tokens from local storage: $error');
@@ -103,7 +107,7 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<Either<String, void>> saveUserToken(String token) async {
     try {
-      await sl<LocalService>().setToken('token', token);
+      await localService.setToken('token', token);
       return Right(null);
     } catch (error) {
       return Left('Failed to save user token: $error');

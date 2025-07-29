@@ -32,9 +32,16 @@ void setupServiceLocator() {
   );
 
   // Repositories
-  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      authService: sl<AuthService>(),
+      localService: sl<LocalService>(),
+    ),
+  );
   sl.registerLazySingleton<TransactionsRepository>(
-    () => TransactionsRepositoryImpl(),
+    () => TransactionsRepositoryImpl(
+      transactionsService: sl<TransactionsService>(),
+    ),
   );
 
   // Usecases
