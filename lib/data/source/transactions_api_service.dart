@@ -4,57 +4,43 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:tech_challenge_3/data/models/transaction.dart';
 import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
-import 'package:tech_challenge_3/domain/entities/transaction.dart';
+import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 
-abstract class TransactionsApiService {
-  Future<Either> getTransactions();
-  Future<Either> addTransaction(TransactionCreateDto transaction);
-  Future<Either> updateTransaction(String id, TransactionUpdateDto transaction);
-  Future<Either> deleteTransaction(String id);
-  Future<Either<String, String>> uploadAttachment(
-    String transactionId,
-    File imageFile,
-  );
-}
-
-class TransactionsApiServiceImpl extends TransactionsApiService {
+class TransactionsApiServiceImpl implements TransactionsService {
   @override
-  Future<Either> getTransactions() async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return Left('User not authenticated');
-    }
-
+  Future<Either<Exception, List<TransactionModel>>> getTransactions(
+    userId,
+  ) async {
     try {
       final QuerySnapshot<Map<String, dynamic>> snapshot =
           await FirebaseFirestore.instance
               .collection('transactions')
-              .where('userUid', isEqualTo: user.uid)
+              .where('userUid', isEqualTo: userId)
               .get();
 
-      final List<TransactionEntity> transactions =
-          snapshot.docs.map((doc) {
-            final data = doc.data();
-            return TransactionEntity.fromJson(data);
-          }).toList();
+      final List<TransactionModel> transactions =
+          snapshot.docs
+              .map(
+                (doc) =>
+                    TransactionModel.fromJson({...doc.data(), 'id': doc.id}),
+              )
+              .toList();
       return Right(transactions);
-    } catch (e) {
-      return Left('Failed to fetch transactions: $e');
+    } on Exception catch (e) {
+      return Left(e);
     }
   }
 
   @override
-  Future<Either> addTransaction(TransactionCreateDto transaction) async {
-    final User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      return Left('User not authenticated');
-    }
-
+  Future<Either<String, String>> addTransaction(
+    TransactionCreateDto transaction,
+  ) async {
     try {
-      final transactionEntity = TransactionEntity(
-        userUid: user.uid,
+      final transactionModel = TransactionModel(
+        userUid: transaction.userUid ?? '',
         type: transaction.type,
         description: transaction.description,
         amount: transaction.amount,
@@ -63,9 +49,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
 
       final docRef = await FirebaseFirestore.instance
           .collection('transactions')
-          .add(transactionEntity.toJson());
-
-      await docRef.update({'id': docRef.id});
+          .add(transactionModel.toJson());
 
       return Right(docRef.id);
     } catch (e) {
@@ -74,7 +58,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
   }
 
   @override
-  Future<Either> updateTransaction(
+  Future<Either<String, void>> updateTransaction(
     String id,
     TransactionUpdateDto transaction,
   ) async {
@@ -91,7 +75,7 @@ class TransactionsApiServiceImpl extends TransactionsApiService {
   }
 
   @override
-  Future<Either> deleteTransaction(String id) async {
+  Future<Either<String, void>> deleteTransaction(String id) async {
     try {
       await FirebaseFirestore.instance
           .collection('transactions')
