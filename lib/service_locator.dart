@@ -30,13 +30,18 @@ void setupServiceLocator() {
   sl.registerSingleton<TransactionsService>(TransactionsApiServiceImpl());
 
   // Repositories
-  sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
+  sl.registerLazySingleton<AuthRepository>( 
+  () => AuthRepositoryImpl(
+    authApiService: sl(),      
+    authLocalService: sl(),     
+  ),
+);
   sl.registerSingleton<TransactionsRepository>(TransactionsRepositoryImpl());
 
   // Usecases
   sl.registerSingleton<SignupUseCase>(SignupUseCase());
   sl.registerSingleton<IsLoggedInUseCase>(IsLoggedInUseCase());
-  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
+  sl.registerLazySingleton<GetUserUseCase>(() => GetUserUseCase(sl()));
   sl.registerSingleton<LogoutUseCase>(LogoutUseCase());
   sl.registerSingleton<SigninUseCase>(SigninUseCase());
   sl.registerSingleton<CreateTransactionUseCase>(CreateTransactionUseCase());
