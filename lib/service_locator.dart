@@ -2,11 +2,14 @@ import 'package:get_it/get_it.dart';
 import 'package:tech_challenge_3/core/network/dio_client.dart';
 import 'package:tech_challenge_3/data/repository/auth.dart';
 import 'package:tech_challenge_3/data/repository/transactions.dart';
+import 'package:tech_challenge_3/data/repository/pin.dart';
 import 'package:tech_challenge_3/data/source/auth_api_service.dart';
 import 'package:tech_challenge_3/data/source/auth_local_service.dart';
 import 'package:tech_challenge_3/data/source/transactions_api_service.dart';
+import 'package:tech_challenge_3/data/source/pin_local_service.dart';
 import 'package:tech_challenge_3/domain/repository/auth.dart';
 import 'package:tech_challenge_3/domain/repository/transactions.dart';
+import 'package:tech_challenge_3/domain/repository/pin.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/get_user.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/is_logged_in.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/logout.dart';
@@ -15,6 +18,8 @@ import 'package:tech_challenge_3/domain/usecases/auth/signup.dart';
 import 'package:tech_challenge_3/domain/usecases/transactions/create_transaction.dart';
 import 'package:tech_challenge_3/domain/usecases/transactions/get_transactions.dart';
 import 'package:tech_challenge_3/domain/usecases/transactions/upload_transaction_attachment.dart';
+import 'package:tech_challenge_3/domain/usecases/pin/create_pin.dart';
+import 'package:tech_challenge_3/domain/usecases/pin/validate_pin.dart';
 
 final sl = GetIt.instance;
 
@@ -25,10 +30,12 @@ void setupServiceLocator() {
   sl.registerSingleton<AuthApiService>(AuthApiServiceImpl());
   sl.registerSingleton<AuthLocalService>(AuthLocalServiceImpl());
   sl.registerSingleton<TransactionsApiService>(TransactionsApiServiceImpl());
+  sl.registerSingleton<PinLocalService>(PinLocalServiceImpl());
 
   // Repositories
   sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
   sl.registerSingleton<TransactionsRepository>(TransactionsRepositoryImpl());
+  sl.registerSingleton<PinRepository>(PinRepositoryImpl());
 
   // Usecases
   sl.registerSingleton<SignupUseCase>(SignupUseCase());
@@ -41,4 +48,6 @@ void setupServiceLocator() {
   sl.registerSingleton<UploadTransactionAttachmentUseCase>(
     UploadTransactionAttachmentUseCase(),
   );
+  sl.registerSingleton<CreatePinUseCase>(CreatePinUseCase());
+  sl.registerSingleton<ValidatePinUseCase>(ValidatePinUseCase());
 }
