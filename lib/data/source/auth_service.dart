@@ -1,19 +1,15 @@
-import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:dartz/dartz.dart';
 
+import 'package:tech_challenge_3/domain/source/auth_service.dart';
 import '../models/signin_req_params.dart';
 import '../models/signup_req_params.dart';
 
-abstract class AuthApiService {
-  Future<Either> signup(SignupReqParams signupReq);
-  Future<Either> getUser();
-  Future<Either> signin(SigninReqParams signinReq);
-  Future<Either> logout();
-}
-
-class AuthApiServiceImpl extends AuthApiService {
+class AuthServiceImpl implements AuthService {
   @override
-  Future<Either> signup(SignupReqParams signupReq) async {
+  Future<Either<String, UserCredential>> signUp(
+    SignupReqParams signupReq,
+  ) async {
     try {
       UserCredential createdUser = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
@@ -24,26 +20,14 @@ class AuthApiServiceImpl extends AuthApiService {
       await createdUser.user?.reload();
       return Right(createdUser);
     } on FirebaseAuthException catch (e) {
-      return Left(e.message);
+      return Left(e.message ?? 'An error occurred during signup');
     }
   }
 
   @override
-  Future<Either> getUser() async {
-    try {
-      User? user = FirebaseAuth.instance.currentUser;
-      if (user?.uid != null) {
-        return Right(user);
-      } else {
-        return Left('No user found');
-      }
-    } on FirebaseAuthException catch (e) {
-      return Left(e.message);
-    }
-  }
-
-  @override
-  Future<Either> signin(SigninReqParams signinReq) async {
+  Future<Either<String, UserCredential>> signIn(
+    SigninReqParams signinReq,
+  ) async {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(
@@ -52,17 +36,27 @@ class AuthApiServiceImpl extends AuthApiService {
           );
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
-      return Left(e.message);
+      return Left(e.message ?? 'An error occurred during signin');
     }
   }
 
   @override
-  Future<Either> logout() async {
+  Future<Either<String, User?>> getUser() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      return Right(user);
+    } on FirebaseAuthException catch (e) {
+      return Left(e.message ?? 'An error occurred while fetching user');
+    }
+  }
+
+  @override
+  Future<Either<String, void>> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
       return Right(null);
     } on FirebaseAuthException catch (e) {
-      return Left(e.message);
+      return Left(e.message ?? 'An error occurred during logout');
     }
   }
 }
