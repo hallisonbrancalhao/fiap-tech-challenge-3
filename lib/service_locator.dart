@@ -27,7 +27,12 @@ void setupServiceLocator() {
   sl.registerSingleton<TransactionsApiService>(TransactionsApiServiceImpl());
 
   // Repositories
-  sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
+  sl.registerLazySingleton<AuthRepository>( 
+  () => AuthRepositoryImpl(
+    authApiService: sl(),      
+    authLocalService: sl(),     
+  ),
+);
   sl.registerSingleton<TransactionsRepository>(TransactionsRepositoryImpl());
 
   // Usecases

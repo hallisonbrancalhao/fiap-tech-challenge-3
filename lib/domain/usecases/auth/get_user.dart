@@ -1,16 +1,21 @@
-import 'package:dartz/dartz.dart';
+import 'package:tech_challenge_3/core/usecase/usecase.dart'; 
+import 'package:tech_challenge_3/domain/entities/user.dart';
+import 'package:tech_challenge_3/domain/repository/auth.dart' as domain_auth_repo;
 
-import 'package:tech_challenge_3/core/usecase/usecase.dart';
-import 'package:tech_challenge_3/domain/repository/auth.dart';
 
-
-class GetUserUseCase implements UseCase<Either<dynamic, dynamic>, dynamic> {
-  final AuthRepository repository; // AuthRepository deve ser a interface abstrata
+class GetUserUseCase implements UseCase<UserEntity, String> {
+  final domain_auth_repo.AuthRepository repository;
 
   GetUserUseCase(this.repository);
 
   @override
-  Future<Either<dynamic, dynamic>> call({dynamic param}) async {
-    return await repository.getUser();
+  Future<UserEntity> call({String? param}) async {
+    final result = await repository.getUser();
+    return result.fold(
+      (errorMessage) {
+        throw Exception(errorMessage);
+      },
+      (userEntity) => userEntity,
+    );
   }
 }
