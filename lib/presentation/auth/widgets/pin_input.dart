@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class PinInput extends StatefulWidget {
   final Function(String) onCompleted;
-  const PinInput({super.key, required this.onCompleted});
+  final VoidCallback? onReset;
+  const PinInput({super.key, required this.onCompleted, this.onReset});
 
   @override
   State<PinInput> createState() => _PinInputState();
@@ -11,13 +12,25 @@ class PinInput extends StatefulWidget {
 class _PinInputState extends State<PinInput> {
   final List<String> _pin = ['', '', '', ''];
   final List<FocusNode> _focusNodes = [];
+  final List<TextEditingController> _controllers = [];
 
   @override
   void initState() {
     super.initState();
     for (int i = 0; i < 4; i++) {
       _focusNodes.add(FocusNode());
+      _controllers.add(TextEditingController());
     }
+  }
+
+  void resetPin() {
+    setState(() {
+      for (int i = 0; i < 4; i++) {
+        _pin[i] = '';
+        _controllers[i].clear();
+      }
+    });
+    _focusNodes[0].requestFocus();
   }
 
   @override
@@ -28,6 +41,7 @@ class _PinInputState extends State<PinInput> {
         return SizedBox(
           width: 50,
           child: TextField(
+            controller: _controllers[index],
             focusNode: _focusNodes[index],
             textAlign: TextAlign.center,
             keyboardType: TextInputType.number,
@@ -46,14 +60,16 @@ class _PinInputState extends State<PinInput> {
               }
 
               if (_pin.every((digit) => digit.isNotEmpty)) {
+                final completedPin = _pin.join();
                 FocusScope.of(context).unfocus();
-                widget.onCompleted(_pin.join());
+                widget.onCompleted(completedPin);
               }
             },
             onSubmitted: (_) {
               if (index == 3 && _pin.every((digit) => digit.isNotEmpty)) {
+                final completedPin = _pin.join();
                 FocusScope.of(context).unfocus();
-                widget.onCompleted(_pin.join());
+                widget.onCompleted(completedPin);
               }
             },
           ),
@@ -66,6 +82,9 @@ class _PinInputState extends State<PinInput> {
   void dispose() {
     for (var node in _focusNodes) {
       node.dispose();
+    }
+    for (var controller in _controllers) {
+      controller.dispose();
     }
     super.dispose();
   }

@@ -12,6 +12,7 @@ import 'package:tech_challenge_3/presentation/home/pages/home.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 import 'package:tech_challenge_3/presentation/auth/widgets/pin_input.dart';
 import 'package:tech_challenge_3/presentation/auth/widgets/create_pin_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -48,8 +49,7 @@ class _SignupPageState extends State<SignupPage> {
                 barrierDismissible: false,
                 builder:
                     (context) => CreatePinDialog(
-                      onPinCreated: (pin) {
-                        // TODO: Salvar PIN no Firestore após integração de segurança
+                      onPinCreated: (pin) async {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(

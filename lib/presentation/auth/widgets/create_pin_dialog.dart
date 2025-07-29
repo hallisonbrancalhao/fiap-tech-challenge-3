@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_challenge_3/common/widgets/dialogs/base_dialog.dart';
 import 'package:tech_challenge_3/presentation/auth/widgets/pin_input.dart';
 
@@ -27,11 +26,9 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
           const Text('Este PIN será usado como segundo fator de autenticação.'),
           const SizedBox(height: 16),
           PinInput(
-            onCompleted: (pin) async {
+            onCompleted: (pin) {
               final validation = _validatePin(pin);
               if (validation == null) {
-                await _savePinToLocalStorage(pin);
-
                 widget.onPinCreated(pin);
               } else {
                 setState(() {
@@ -45,10 +42,6 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
             Text(errorText!, style: const TextStyle(color: Colors.red)),
           ],
           const SizedBox(height: 8),
-          const Text(
-            'Dica: Use 1234 para testes.',
-            style: TextStyle(fontSize: 12, color: Colors.grey),
-          ),
         ],
       ),
       actions: [
@@ -66,12 +59,6 @@ class _CreatePinDialogState extends State<CreatePinDialog> {
       return 'PIN deve conter apenas números';
     }
     return null;
-  }
-
-  Future<void> _savePinToLocalStorage(String pin) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_pin', pin);
-    await prefs.setString('pin_created_at', DateTime.now().toIso8601String());
   }
 
   static Future<void> show({

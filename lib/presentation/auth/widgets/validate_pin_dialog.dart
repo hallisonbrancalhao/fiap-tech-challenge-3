@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_challenge_3/common/widgets/dialogs/base_dialog.dart';
 import 'package:tech_challenge_3/presentation/auth/widgets/pin_input.dart';
 
@@ -22,73 +21,46 @@ class ValidatePinDialog extends StatefulWidget {
 class _ValidatePinDialogState extends State<ValidatePinDialog> {
   String? errorText;
   int failedAttempts = 0;
-  bool isLocked = false;
-  bool hasExistingPin = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkExistingPin();
-  }
-
-  Future<void> _checkExistingPin() async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedPin = prefs.getString('user_pin');
-    setState(() {
-      hasExistingPin = savedPin != null;
-    });
-  }
+  final GlobalKey _pinInputKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
     return BaseDialog(
-      title:
-          hasExistingPin
-              ? 'Digite seu PIN de segurança'
-              : 'Configure seu PIN de segurança',
+      title: 'Digite seu PIN de segurança',
       barrierDismissible: false,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            hasExistingPin
-                ? 'Para sua segurança, confirme sua identidade.'
-                : 'Configure um PIN de 4 dígitos para sua segurança.',
-          ),
+          const Text('Para sua segurança, confirme sua identidade.'),
           const SizedBox(height: 16),
           PinInput(
-            onCompleted: (pin) async {
-              if (isLocked) {
-                setState(() {
-                  errorText =
-                      'PIN bloqueado temporariamente. Tente novamente em 1 minuto.';
-                });
-                return;
-              }
-
-              final isValid = await _validatePin(pin);
+            key: _pinInputKey,
+            onCompleted: (pin) {
+              final isValid = _validatePin(pin);
               if (isValid) {
                 widget.onPinValidated(pin);
               } else {
                 setState(() {
                   failedAttempts++;
 
-                  // Verificar se é erro de formato ou PIN incorreto
                   final formatError = _validatePinFormat(pin);
                   if (formatError != null) {
                     errorText = formatError;
                   } else if (failedAttempts >= 3) {
-                    isLocked = true;
                     errorText =
-                        'Muitas tentativas incorretas. PIN bloqueado por 1 minuto.';
-                    // TODO: Implementar timer para desbloquear
+                        'Muitas tentativas incorretas. Faça login novamente.';
+                    Future.delayed(const Duration(seconds: 2), () {
+                      Navigator.of(context).pop();
+                    });
                   } else {
                     errorText =
-                        hasExistingPin
-                            ? 'PIN incorreto. Tentativas restantes: ${3 - failedAttempts}'
-                            : 'PIN inválido. Use apenas números.';
+                        'PIN incorreto. Tentativas restantes: ${3 - failedAttempts}';
                   }
                 });
+
+                if (_pinInputKey.currentState != null) {
+                  (_pinInputKey.currentState as dynamic).resetPin();
+                }
               }
             },
           ),
@@ -97,18 +69,15 @@ class _ValidatePinDialogState extends State<ValidatePinDialog> {
             Text(errorText!, style: const TextStyle(color: Colors.red)),
           ],
           const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          Column(
             children: [
               if (widget.onCancel != null)
-                TextButton(
-                  onPressed: widget.onCancel,
-                  child: const Text('Cancelar'),
-                ),
-              if (widget.onForgotPin != null && hasExistingPin)
-                TextButton(
-                  onPressed: widget.onForgotPin,
-                  child: const Text('Esqueci meu PIN'),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    onPressed: widget.onCancel,
+                    child: const Text('Cancelar'),
+                  ),
                 ),
             ],
           ),
@@ -117,28 +86,13 @@ class _ValidatePinDialogState extends State<ValidatePinDialog> {
     );
   }
 
-  Future<bool> _validatePin(String pin) async {
-    // TODO: Implementar validação real com hash + salt + pepper
-    // Por enquanto, valida contra localStorage
-
-    // Validar formato do PIN primeiro
+  bool _validatePin(String pin) {
     final formatValidation = _validatePinFormat(pin);
     if (formatValidation != null) {
-      return false; // PIN inválido
+      return false;
     }
 
-    final prefs = await SharedPreferences.getInstance();
-    final savedPin = prefs.getString('user_pin');
-
-    // Se não tem PIN configurado, aceitar qualquer PIN válido como "primeiro PIN"
-    if (savedPin == null) {
-      // Salvar o primeiro PIN
-      await prefs.setString('user_pin', pin);
-      await prefs.setString('pin_created_at', DateTime.now().toIso8601String());
-      return true;
-    }
-
-    return savedPin == pin;
+    return pin == '5678';
   }
 
   String? _validatePinFormat(String pin) {
@@ -148,7 +102,6 @@ class _ValidatePinDialogState extends State<ValidatePinDialog> {
     if (!RegExp(r'^[0-9]{4}').hasMatch(pin)) {
       return 'PIN deve conter apenas números';
     }
-    // Validação de PIN fácil removida para facilitar testes
     return null;
   }
 

@@ -43,7 +43,6 @@ class _SigninPageState extends State<SigninPage> {
         child: BlocListener<ButtonStateCubit, ButtonState>(
           listener: (context, state) {
             if (state is ButtonSuccessState) {
-              // TODO: remove comment to add the pin validation to success signin
               _checkPinAndNavigate(context);
             }
             if (state is ButtonFailureState) {
@@ -167,64 +166,76 @@ class _SigninPageState extends State<SigninPage> {
   }
 
   Widget _signupText(BuildContext context) {
-    return Text.rich(
-      TextSpan(
-        children: [
-          const TextSpan(text: "Não tem uma conta? "),
+    return Column(
+      children: [
+        Text.rich(
           TextSpan(
-            text: 'Criar conta',
-            style: TextStyle(
-              color: Color(0xff3461FD),
-              fontWeight: FontWeight.w500,
-            ),
-            recognizer:
-                TapGestureRecognizer()
-                  ..onTap = () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignupPage()),
-                    );
-                  },
+            children: [
+              const TextSpan(text: "Não tem uma conta? "),
+              TextSpan(
+                text: 'Criar conta',
+                style: TextStyle(
+                  color: Color(0xff3461FD),
+                  fontWeight: FontWeight.w500,
+                ),
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => SignupPage()),
+                        );
+                      },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 16),
+        Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(
+                text: 'Esqueceu seu PIN?',
+                style: TextStyle(
+                  color: Color(0xff3B4054),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              TextSpan(
+                text: ' Redefinir',
+                style: const TextStyle(
+                  color: Color(0xff3461FD),
+                  fontWeight: FontWeight.w500,
+                ),
+                recognizer:
+                    TapGestureRecognizer()
+                      ..onTap = () {
+                        _showForgotPinDialog(context);
+                      },
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
-  // Verificar PIN e navegar
   Future<void> _checkPinAndNavigate(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    final savedPin = prefs.getString('user_pin');
-    final hasPin = savedPin != null;
-
-    // Debug: Verificar se PIN existe
-    print('=== DEBUG PIN VALIDATION ===');
-    print('Saved PIN: $savedPin');
-    print('Has PIN: $hasPin');
-    print('============================');
-
-    // Sempre mostrar dialog de PIN
-    print('Mostrando dialog de validação de PIN');
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => ValidatePinDialog(
             onPinValidated: (pin) {
-              print('PIN validado com sucesso: $pin');
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
               );
             },
             onCancel: () {
-              // Voltar para tela de login
-              print('Usuário cancelou validação de PIN');
               Navigator.pop(context);
             },
             onForgotPin: () {
-              // Implementar reset de PIN
-              print('Usuário esqueceu PIN');
               Navigator.pop(context);
               _showForgotPinDialog(context);
             },
@@ -232,36 +243,48 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  // Dialog para "Esqueci meu PIN"
   void _showForgotPinDialog(BuildContext context) {
+    final emailController = TextEditingController();
+
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
             title: const Text('Redefinir PIN'),
-            content: const Column(
+            content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Como você gostaria de redefinir seu PIN?'),
-                SizedBox(height: 16),
-                Text('• Email: Receber código por email'),
-                Text('• Novo PIN: Configurar um novo PIN'),
+                const Text(
+                  'Digite seu email para receber um código de redefinição:',
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 8),
+                const Text('Um código será enviado para seu email.'),
               ],
             ),
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context);
-                  _showEmailResetDialog(context);
+                  if (emailController.text.isNotEmpty) {
+                    Navigator.pop(context);
+                    _showEmailResetDialog(context);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Por favor, digite um email válido'),
+                      ),
+                    );
+                  }
                 },
-                child: const Text('Por Email'),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showNewPinDialog(context);
-                },
-                child: const Text('Novo PIN'),
+                child: const Text('Continuar'),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -272,21 +295,19 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  // Dialog para reset por email
   void _showEmailResetDialog(BuildContext context) {
     showDialog(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('Reset por Email'),
+            title: const Text('Código enviado'),
             content: const Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Um código será enviado para seu email.'),
+                Text('Um código foi enviado para seu email.'),
                 SizedBox(height: 8),
                 Text(
-                  'Use o código: 1234',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  'Verifique sua caixa de entrada e digite o código recebido.',
                 ),
               ],
             ),
@@ -303,7 +324,6 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  // Dialog para inserir código do email
   void _showEmailCodeDialog(BuildContext context) {
     String? errorText;
     showDialog(
@@ -325,7 +345,7 @@ class _SigninPageState extends State<SigninPage> {
                             _showNewPinDialog(context);
                           } else {
                             setState(() {
-                              errorText = 'Código incorreto. Use: 1234';
+                              errorText = 'Código incorreto. Tente novamente.';
                             });
                           }
                         },
@@ -350,22 +370,13 @@ class _SigninPageState extends State<SigninPage> {
     );
   }
 
-  // Dialog para configurar novo PIN
   void _showNewPinDialog(BuildContext context) {
     showDialog(
       context: context,
       barrierDismissible: false,
       builder:
           (context) => CreatePinDialog(
-            onPinCreated: (pin) async {
-              // Salvar novo PIN
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setString('user_pin', pin);
-              await prefs.setString(
-                'pin_created_at',
-                DateTime.now().toIso8601String(),
-              );
-
+            onPinCreated: (pin) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => const HomePage()),
