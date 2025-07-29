@@ -7,15 +7,19 @@ import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
 import 'package:tech_challenge_3/domain/entities/transaction.dart';
 import 'package:tech_challenge_3/domain/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/domain/source/transactions_service.dart';
-import 'package:tech_challenge_3/service_locator.dart';
 
 class TransactionsRepositoryImpl implements TransactionsRepository {
+  TransactionsService transactionsService;
+
+  TransactionsRepositoryImpl({required this.transactionsService});
+
   @override
   Future<Either<String, String>> addTransaction(
     TransactionCreateDto transaction,
   ) async {
-    Either<String, String> result = await sl<TransactionsService>()
-        .addTransaction(transaction);
+    Either<String, String> result = await transactionsService.addTransaction(
+      transaction,
+    );
     return result.fold(
       (error) {
         return Left(error);
@@ -28,7 +32,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
 
   @override
   Future<Either<String, void>> deleteTransaction(String id) async {
-    Either result = await sl<TransactionsService>().deleteTransaction(id);
+    Either result = await transactionsService.deleteTransaction(id);
     return result.fold((data) => Right(null), (error) => Left(error));
   }
 
@@ -36,8 +40,8 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
   Future<Either<Exception, List<TransactionEntity>>> getTransactions(
     String userId,
   ) async {
-    Either<Exception, List<TransactionModel>> result =
-        await sl<TransactionsService>().getTransactions(userId);
+    Either<Exception, List<TransactionModel>> result = await transactionsService
+        .getTransactions(userId);
 
     return result.fold(
       (error) {
@@ -56,7 +60,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     String id,
     TransactionUpdateDto transaction,
   ) async {
-    Either result = await sl<TransactionsService>().updateTransaction(
+    Either result = await transactionsService.updateTransaction(
       id,
       transaction,
     );
@@ -75,7 +79,7 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     String transactionId,
     File imageFile,
   ) async {
-    final result = await sl<TransactionsService>().uploadAttachment(
+    final result = await transactionsService.uploadAttachment(
       transactionId,
       imageFile,
     );
