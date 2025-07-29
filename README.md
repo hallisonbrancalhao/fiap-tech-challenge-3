@@ -102,7 +102,7 @@ lib/
 
 ## Funcionalidades
 
-- Autenticação de usuários
+- Autenticação de usuários com duplo fator (PIN)
 - Gerenciamento de transações financeiras
 - Visualização de extrato
 - Gráficos de gastos
@@ -120,6 +120,78 @@ lib/
 - `intl`: Formatação de datas e valores
 - `image_picker`: Seleção de imagens
 - `flutter_svg`: Suporte a SVG
+- `shared_preferences`: Armazenamento local seguro
+- `dartz`: Programação funcional para tratamento de erros
+
+## Segurança e Autenticação
+
+### Implementação Atual
+
+O aplicativo implementa um sistema de autenticação de dois fatores utilizando PIN como segundo fator de segurança. A arquitetura de segurança foi desenvolvida seguindo os princípios da Clean Architecture, garantindo separação de responsabilidades e facilitando testes e manutenção.
+
+#### Características de Segurança Implementadas:
+
+- **Duplo Fator**: Autenticação por email/senha + PIN de 4 dígitos
+- **Validação Robusta**: Verificação de formato e comprimento do PIN
+- **Limite de Tentativas**: Máximo de 3 tentativas incorretas
+- **Armazenamento Seguro**: PIN criptografado localmente via SharedPreferences
+- **Tratamento de Erros**: Sistema funcional com Either para resultados seguros
+
+#### Fluxo de Autenticação:
+
+1. **Login**: Email e senha via Firebase Auth
+2. **Segundo Fator**: Validação do PIN de 4 dígitos
+3. **Acesso**: Navegação para área restrita após validação
+
+### Configurações de Desenvolvimento
+
+**Observação**: As configurações atuais são para fins de desenvolvimento e demonstração:
+
+- **PIN Padrão**: `5678` (hardcoded para simulação)
+- **Código de Recuperação**: `1234` (simulação de email)
+- **Armazenamento**: SharedPreferences local (para demonstração)
+
+### Recomendações para Produção
+
+Para um ambiente de produção, recomendamos as seguintes melhorias de segurança:
+
+#### 1. Autenticação de Dois Fatores Profissional
+```dart
+- Google Sign-In com 2FA
+- Apple ID com autenticação biométrica
+- SMS/Email com códigos temporários
+- Authenticator apps (Google Authenticator, Authy)
+```
+
+#### 2. Armazenamento Seguro de PIN
+```dart
+- Flutter Secure Storage (criptografia AES)
+- Biometric Storage (fingerprint/face ID)
+- Hardware Security Module (HSM)
+- Keychain (iOS) / Keystore (Android)
+```
+
+#### 3. Criptografia Avançada
+```dart
+- Hash do PIN com salt único por usuário
+- Criptografia AES-256 para dados sensíveis
+- Certificados SSL/TLS para comunicação
+- Validação de integridade de dados
+```
+
+#### 4. Auditoria e Monitoramento
+```dart
+- Logs de tentativas de acesso
+- Alertas de atividades suspeitas
+- Rate limiting para tentativas de login
+- Geolocalização para detecção de fraudes
+```
+
+### Considerações de Segurança
+- **Separação de Camadas**: Lógica de segurança isolada no domain
+- **Inversão de Dependência**: Interface de repositório permite troca de implementação
+- **Tratamento Funcional**: Either para resultados seguros e previsíveis
+- **Testabilidade**: Cada camada pode ser testada independentemente
 
 ## Troubleshooting
 
