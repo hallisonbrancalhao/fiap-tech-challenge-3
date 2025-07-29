@@ -12,8 +12,11 @@ abstract class TransactionsService {
   Future<Either<String, String>> addTransaction(
     TransactionCreateDto transaction,
   );
-  Future<Either> updateTransaction(String id, TransactionUpdateDto transaction);
-  Future<Either> deleteTransaction(String id);
+  Future<Either<void, String>> updateTransaction(
+    String id,
+    TransactionUpdateDto transaction,
+  );
+  Future<Either<void, String>> deleteTransaction(String id);
   Future<Either<String, String>> uploadAttachment(
     String transactionId,
     File imageFile,

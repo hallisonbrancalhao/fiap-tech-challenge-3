@@ -9,7 +9,7 @@ import 'package:tech_challenge_3/data/models/transaction_create_dto.dart';
 import 'package:tech_challenge_3/data/models/transaction_update_dto.dart';
 import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 
-class TransactionsApiServiceImpl implements TransactionsService {
+class TransactionsServiceImpl implements TransactionsService {
   @override
   Future<Either<List<TransactionModel>, Exception>> getTransactions(
     userId,

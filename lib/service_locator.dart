@@ -4,7 +4,7 @@ import 'package:tech_challenge_3/data/repository/auth_repository.dart';
 import 'package:tech_challenge_3/data/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/data/source/auth_service.dart';
 import 'package:tech_challenge_3/data/source/local_service.dart';
-import 'package:tech_challenge_3/data/source/transactions_api_service.dart';
+import 'package:tech_challenge_3/data/source/transactions_service.dart';
 import 'package:tech_challenge_3/domain/repository/auth_repository.dart';
 import 'package:tech_challenge_3/domain/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/domain/source/auth_service.dart';
@@ -27,7 +27,7 @@ void setupServiceLocator() {
   // Services
   sl.registerSingleton<AuthService>(AuthServiceImpl());
   sl.registerSingleton<LocalService>(LocalServiceImpl());
-  sl.registerSingleton<TransactionsService>(TransactionsApiServiceImpl());
+  sl.registerSingleton<TransactionsService>(TransactionsServiceImpl());
 
   // Repositories
   sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
