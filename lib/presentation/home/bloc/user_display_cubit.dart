@@ -11,7 +11,7 @@ class UserDisplayCubit extends Cubit<UserDisplayState> {
     emit(UserLoading()); 
 
     try {
-      final UserEntity user = await sl<GetUserUseCase>().call(param: ''); // Passando um param vazio como exemplo
+      final UserEntity user = await sl<GetUserUseCase>().call(param: '');
 
       emit(UserLoaded(userEntity: user));
 
