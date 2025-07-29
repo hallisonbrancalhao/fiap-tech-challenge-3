@@ -22,31 +22,34 @@ import 'package:tech_challenge_3/domain/usecases/transactions/upload_transaction
 final sl = GetIt.instance;
 
 void setupServiceLocator() {
-  sl.registerSingleton<DioClient>(DioClient());
+  sl.registerLazySingleton<DioClient>(() => DioClient());
 
   // Services
-  sl.registerSingleton<AuthService>(AuthServiceImpl());
-  sl.registerSingleton<LocalService>(LocalServiceImpl());
-  sl.registerSingleton<TransactionsService>(TransactionsApiServiceImpl());
+  sl.registerLazySingleton<AuthService>(() => AuthServiceImpl());
+  sl.registerLazySingleton<LocalService>(() => LocalServiceImpl());
+  sl.registerLazySingleton<TransactionsService>(
+    () => TransactionsApiServiceImpl(),
+  );
 
   // Repositories
-  sl.registerLazySingleton<AuthRepository>( 
-  () => AuthRepositoryImpl(
-    authApiService: sl(),      
-    authLocalService: sl(),     
-  ),
-);
-  sl.registerSingleton<TransactionsRepository>(TransactionsRepositoryImpl());
+  sl.registerLazySingleton<AuthRepository>(() => AuthRepositoryImpl());
+  sl.registerLazySingleton<TransactionsRepository>(
+    () => TransactionsRepositoryImpl(),
+  );
 
   // Usecases
-  sl.registerSingleton<SignupUseCase>(SignupUseCase());
-  sl.registerSingleton<IsLoggedInUseCase>(IsLoggedInUseCase());
-  sl.registerLazySingleton<GetUserUseCase>(() => GetUserUseCase(sl()));
-  sl.registerSingleton<LogoutUseCase>(LogoutUseCase());
-  sl.registerSingleton<SigninUseCase>(SigninUseCase());
-  sl.registerSingleton<CreateTransactionUseCase>(CreateTransactionUseCase());
-  sl.registerSingleton<GetTransactionsUseCase>(GetTransactionsUseCase());
-  sl.registerSingleton<UploadTransactionAttachmentUseCase>(
-    UploadTransactionAttachmentUseCase(),
+  sl.registerLazySingleton<SignupUseCase>(() => SignupUseCase());
+  sl.registerLazySingleton<IsLoggedInUseCase>(() => IsLoggedInUseCase());
+  sl.registerLazySingleton<GetUserUseCase>(() => GetUserUseCase());
+  sl.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase());
+  sl.registerLazySingleton<SigninUseCase>(() => SigninUseCase());
+  sl.registerLazySingleton<CreateTransactionUseCase>(
+    () => CreateTransactionUseCase(),
+  );
+  sl.registerLazySingleton<GetTransactionsUseCase>(
+    () => GetTransactionsUseCase(),
+  );
+  sl.registerLazySingleton<UploadTransactionAttachmentUseCase>(
+    () => UploadTransactionAttachmentUseCase(),
   );
 }
