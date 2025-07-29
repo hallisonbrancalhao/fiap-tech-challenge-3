@@ -27,26 +27,26 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
   }
 
   @override
-  Future<Either<void, String>> deleteTransaction(String id) async {
+  Future<Either<String, void>> deleteTransaction(String id) async {
     Either result = await sl<TransactionsService>().deleteTransaction(id);
-    return result.fold((error) => Right(error), (data) => Left(null));
+    return result.fold((data) => Right(null), (error) => Left(error));
   }
 
   @override
-  Future<Either<List<TransactionEntity>, Exception>> getTransactions(
+  Future<Either<Exception, List<TransactionEntity>>> getTransactions(
     String userId,
   ) async {
-    Either<List<TransactionModel>, Exception> result =
+    Either<Exception, List<TransactionModel>> result =
         await sl<TransactionsService>().getTransactions(userId);
 
     return result.fold(
+      (error) {
+        return Left(error);
+      },
       (data) {
         final List<TransactionEntity> transactions =
             data.map((model) => model.toEntity()).toList();
-        return Left(transactions);
-      },
-      (error) {
-        return Right(error);
+        return Right(transactions);
       },
     );
   }
@@ -62,10 +62,10 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
     );
     return result.fold(
       (error) {
-        return Right(error);
+        return Left(error);
       },
       (data) {
-        return Left(data);
+        return Right(data);
       },
     );
   }
@@ -79,6 +79,6 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
       transactionId,
       imageFile,
     );
-    return result.fold((error) => Right(error), (url) => Left(url));
+    return result.fold((error) => Left(error), (url) => Right(url));
   }
 }

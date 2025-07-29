@@ -11,12 +11,12 @@ class LogoutUseCase implements UseCase<Either, dynamic> {
     final result = await authRepository.signOut();
 
     return result.fold(
+      (error) {
+        return Left(error);
+      },
       (data) async {
         await authRepository.removeTokensFromLocal();
-        return Left(null);
-      },
-      (error) {
-        return Right(error);
+        return Right(null);
       },
     );
   }

@@ -11,32 +11,34 @@ import '../models/signup_req_params.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   @override
-  Future<Either<UserCredential, String>> signUp(
+  Future<Either<String, UserCredential>> signUp(
     SignupReqParams signupReq,
   ) async {
     Either result = await sl<AuthService>().signUp(signupReq);
     return result.fold(
+      (error) {
+        return Left(error);
+      },
       (data) async {
         UserCredential userCredentials = data;
-
-        return Left(userCredentials);
-      },
-      (error) {
-        return Right(error);
+        return Right(userCredentials);
       },
     );
   }
 
   @override
-  Future<Either<UserEntity, String>> signIn(SigninReqParams signinReq) async {
+  Future<Either<String, UserEntity>> signIn(SigninReqParams signinReq) async {
     Either result = await sl<AuthService>().signIn(signinReq);
     return result.fold(
+      (error) {
+        return Left(error);
+      },
       (data) async {
         UserCredential userCredentials = data;
 
         if (userCredentials.user?.email == null ||
             userCredentials.user?.uid == null) {
-          return Right('User not found');
+          return Left('User not found');
         }
 
         UserEntity user = UserEntity(
@@ -45,21 +47,21 @@ class AuthRepositoryImpl extends AuthRepository {
           email: userCredentials.user!.email ?? '',
         );
 
-        return Left(user);
-      },
-      (error) {
-        return Right(error);
+        return Right(user);
       },
     );
   }
 
   @override
-  Future<Either<UserEntity?, String>> getUser() async {
+  Future<Either<String, UserEntity?>> getUser() async {
     Either result = await sl<AuthService>().getUser();
     return result.fold(
+      (error) {
+        return Left(error);
+      },
       (data) {
         if (data == null) {
-          return Left(null);
+          return Right(null);
         }
 
         final firebaseUser = data;
@@ -68,21 +70,18 @@ class AuthRepositoryImpl extends AuthRepository {
           username: firebaseUser.displayName ?? '',
           email: firebaseUser.email ?? '',
         );
-        return Left(user);
-      },
-      (error) {
-        return Right(error);
+        return Right(user);
       },
     );
   }
 
   @override
-  Future<Either<void, String>> signOut() async {
+  Future<Either<String, void>> signOut() async {
     try {
       await sl<AuthService>().signOut();
-      return Left(null);
+      return Right(null);
     } catch (error) {
-      return Right('Failed to logout from API: $error');
+      return Left('Failed to logout from API: $error');
     }
   }
 
@@ -92,22 +91,22 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
-  Future<Either<void, String>> removeTokensFromLocal() async {
+  Future<Either<String, void>> removeTokensFromLocal() async {
     try {
       await sl<LocalService>().removeTokens();
-      return Left(null);
+      return Right(null);
     } catch (error) {
-      return Right('Failed to remove tokens from local storage: $error');
+      return Left('Failed to remove tokens from local storage: $error');
     }
   }
 
   @override
-  Future<Either<void, String>> saveUserToken(String token) async {
+  Future<Either<String, void>> saveUserToken(String token) async {
     try {
       await sl<LocalService>().setToken('token', token);
-      return Left(null);
+      return Right(null);
     } catch (error) {
-      return Right('Failed to save user token: $error');
+      return Left('Failed to save user token: $error');
     }
   }
 }

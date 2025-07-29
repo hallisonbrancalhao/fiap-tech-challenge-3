@@ -6,11 +6,11 @@ import 'package:tech_challenge_3/data/models/signup_req_params.dart';
 import 'package:tech_challenge_3/domain/entities/user.dart';
 
 abstract class AuthRepository {
-  Future<Either<UserCredential, String>> signUp(SignupReqParams signupReq);
-  Future<Either<UserEntity, String>> signIn(SigninReqParams signinReq);
-  Future<Either<UserEntity?, String>> getUser();
-  Future<Either<void, String>> signOut();
+  Future<Either<String, UserCredential>> signUp(SignupReqParams signupReq);
+  Future<Either<String, UserEntity>> signIn(SigninReqParams signinReq);
+  Future<Either<String, UserEntity?>> getUser();
+  Future<Either<String, void>> signOut();
   Future<bool> isLoggedIn();
-  Future<Either<void, String>> removeTokensFromLocal();
-  Future<Either<void, String>> saveUserToken(String token);
+  Future<Either<String, void>> removeTokensFromLocal();
+  Future<Either<String, void>> saveUserToken(String token);
 }

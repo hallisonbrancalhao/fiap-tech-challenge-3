@@ -11,7 +11,7 @@ import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 
 class TransactionsApiServiceImpl implements TransactionsService {
   @override
-  Future<Either<List<TransactionModel>, Exception>> getTransactions(
+  Future<Either<Exception, List<TransactionModel>>> getTransactions(
     userId,
   ) async {
     try {
@@ -28,9 +28,9 @@ class TransactionsApiServiceImpl implements TransactionsService {
                     TransactionModel.fromJson({...doc.data(), 'id': doc.id}),
               )
               .toList();
-      return Left(transactions);
+      return Right(transactions);
     } on Exception catch (e) {
-      return Right(e);
+      return Left(e);
     }
   }
 
@@ -51,14 +51,14 @@ class TransactionsApiServiceImpl implements TransactionsService {
           .collection('transactions')
           .add(transactionModel.toJson());
 
-      return Left(docRef.id);
+      return Right(docRef.id);
     } catch (e) {
-      return Right('Failed to add transaction: $e');
+      return Left('Failed to add transaction: $e');
     }
   }
 
   @override
-  Future<Either<void, String>> updateTransaction(
+  Future<Either<String, void>> updateTransaction(
     String id,
     TransactionUpdateDto transaction,
   ) async {
@@ -68,22 +68,22 @@ class TransactionsApiServiceImpl implements TransactionsService {
           .doc(id)
           .update(transaction.toJson());
 
-      return Left(null);
+      return Right(null);
     } catch (e) {
-      return Right('Failed to update transaction: $e');
+      return Left('Failed to update transaction: $e');
     }
   }
 
   @override
-  Future<Either<void, String>> deleteTransaction(String id) async {
+  Future<Either<String, void>> deleteTransaction(String id) async {
     try {
       await FirebaseFirestore.instance
           .collection('transactions')
           .doc(id)
           .delete();
-      return Left(null);
+      return Right(null);
     } catch (e) {
-      return Right('Failed to delete transaction: $e');
+      return Left('Failed to delete transaction: $e');
     }
   }
 
@@ -94,7 +94,7 @@ class TransactionsApiServiceImpl implements TransactionsService {
   ) async {
     final User? user = FirebaseAuth.instance.currentUser;
     if (user == null) {
-      return Right('User not authenticated');
+      return Left('User not authenticated');
     }
 
     try {
@@ -114,11 +114,11 @@ class TransactionsApiServiceImpl implements TransactionsService {
           .doc(transactionId)
           .update({'attachmentUrl': downloadUrl});
 
-      return Left(downloadUrl);
+      return Right(downloadUrl);
     } on FirebaseException catch (e) {
-      return Right('Erro de Storage: ${e.code} - ${e.message}');
+      return Left('Erro de Storage: ${e.code} - ${e.message}');
     } catch (e) {
-      return Right('Falha ao enviar anexo: $e');
+      return Left('Falha ao enviar anexo: $e');
     }
   }
 }

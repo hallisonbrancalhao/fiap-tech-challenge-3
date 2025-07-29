@@ -7,7 +7,7 @@ import '../models/signup_req_params.dart';
 
 class AuthServiceImpl implements AuthService {
   @override
-  Future<Either<UserCredential, String>> signUp(
+  Future<Either<String, UserCredential>> signUp(
     SignupReqParams signupReq,
   ) async {
     try {
@@ -18,14 +18,14 @@ class AuthServiceImpl implements AuthService {
           );
       await createdUser.user?.updateDisplayName(signupReq.username);
       await createdUser.user?.reload();
-      return Left(createdUser);
+      return Right(createdUser);
     } on FirebaseAuthException catch (e) {
-      return Right(e.message ?? 'An error occurred during signup');
+      return Left(e.message ?? 'An error occurred during signup');
     }
   }
 
   @override
-  Future<Either<UserCredential, String>> signIn(
+  Future<Either<String, UserCredential>> signIn(
     SigninReqParams signinReq,
   ) async {
     try {
@@ -34,29 +34,29 @@ class AuthServiceImpl implements AuthService {
             email: signinReq.email,
             password: signinReq.password,
           );
-      return Left(userCredential);
+      return Right(userCredential);
     } on FirebaseAuthException catch (e) {
-      return Right(e.message ?? 'An error occurred during signin');
+      return Left(e.message ?? 'An error occurred during signin');
     }
   }
 
   @override
-  Future<Either<User?, String>> getUser() async {
+  Future<Either<String, User?>> getUser() async {
     try {
       User? user = FirebaseAuth.instance.currentUser;
-      return Left(user);
+      return Right(user);
     } on FirebaseAuthException catch (e) {
-      return Right(e.message ?? 'An error occurred while fetching user');
+      return Left(e.message ?? 'An error occurred while fetching user');
     }
   }
 
   @override
-  Future<Either<void, String>> signOut() async {
+  Future<Either<String, void>> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      return Left(null);
+      return Right(null);
     } on FirebaseAuthException catch (e) {
-      return Right(e.message ?? 'An error occurred during logout');
+      return Left(e.message ?? 'An error occurred during logout');
     }
   }
 }
