@@ -25,6 +25,8 @@ import 'package:tech_challenge_3/common/bloc/button/button_state_cubit.dart';
 
 import 'package:tech_challenge_3/domain/entities/transaction.dart';
 
+import 'package:tech_challenge_3/ui/auth/signin/widgets/signin_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -73,12 +75,7 @@ class MainApp extends StatelessWidget {
           ],
           supportedLocales: [Locale('pt')],
 
-          home: switch (state) {
-            AppInitialState() => const SplashScreen(),
-            Authenticated() => const HomePage(),
-            UnAuthenticated() => SigninPage(),
-            _ => const SplashScreen(),
-          },
+          home: SigninScreen(),
           routes: {
             AppRoutes.login: (context) => SigninPage(),
             AppRoutes.signup: (context) => SignupPage(),
