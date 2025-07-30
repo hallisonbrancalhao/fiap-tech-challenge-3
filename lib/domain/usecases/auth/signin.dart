@@ -12,11 +12,12 @@ class SigninUseCase implements UseCase<Either, SigninReqParams> {
 
     return result.fold(
       (error) {
-        return Right(error);
+        return Left(error);
       },
       (data) async {
         await sl<AuthRepository>().saveUserToken(data.uid);
-        return Left(data);
+        await sl<AuthRepository>().saveUserUid(data.uid);
+        return Right(data);
       },
     );
   }

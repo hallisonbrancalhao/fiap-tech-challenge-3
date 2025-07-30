@@ -41,10 +41,12 @@ class TransactionsDisplayCubit extends Cubit<TransactionsDisplayState> {
   Future<void> fetchTransactions() async {
     emit(TransactionsDisplayLoading());
     final result = await _getTransactionsUseCase.call();
-    result.fold((transactions) {
-      final txList = List<TransactionEntity>.from(transactions);
-      txList.sort((a, b) => b.date.compareTo(a.date));
-      emit(TransactionsDisplayLoaded(transactions: txList));
-    }, (error) => emit(TransactionsDisplayError(errorMessage: error)));
+    result.fold(
+      (error) => emit(TransactionsDisplayError(errorMessage: error)),
+      (transactions) {
+        transactions.sort((a, b) => b.date.compareTo(a.date));
+        emit(TransactionsDisplayLoaded(transactions: transactions));
+      },
+    );
   }
 }
