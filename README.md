@@ -129,6 +129,10 @@ lib/
 
 O aplicativo implementa um sistema de autenticação de dois fatores utilizando PIN como segundo fator de segurança. A arquitetura de segurança foi desenvolvida seguindo os princípios da Clean Architecture, garantindo separação de responsabilidades e facilitando testes e manutenção.
 
+### Demonstração da autenticação de dois fatores utilizando PIN:
+
+![pin_demonstration_gif](https://github.com/user-attachments/assets/2a0e27e4-8b8e-4db3-9cb3-b4da65bc34d0)
+
 #### Características de Segurança Implementadas:
 
 - **Duplo Fator**: Autenticação por email/senha + PIN de 4 dígitos
