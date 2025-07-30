@@ -29,7 +29,7 @@ class TransactionsPieChart extends StatelessWidget {
     for (var t in list)
       transactionTypeToString(t.type): (list
           .where((e) => e.type == t.type)
-          .fold(0.0, (a, b) => a + b.amount)),
+          .fold(0.0, (a, b) => a + b.amount.abs())),
   };
 
   List<PieChartSectionData> _buildSections(Map<String, double> data) =>
