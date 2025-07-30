@@ -1,13 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tech_challenge_3/data/models/pin_dto.dart';
-
-abstract class PinLocalService {
-  Future<Either<String, PinDto?>> getPin();
-  Future<Either<String, void>> savePin(PinDto pin);
-  Future<Either<String, void>> deletePin();
-  Future<Either<String, void>> updateLastUsedAt();
-}
+import 'package:tech_challenge_3/domain/source/pin_local_service.dart';
 
 class PinLocalServiceImpl implements PinLocalService {
   static const String _pinKey = 'user_pin';
@@ -21,7 +15,7 @@ class PinLocalServiceImpl implements PinLocalService {
       final lastUsedAtString = prefs.getString(_lastUsedAtKey);
 
       if (pinValue == null) {
-        // Para compatibilidade com o código existente, retornamos o PIN padrão
+        //Para simulação de PINs existentes
         final pin = PinDto(
           value: '5678',
           createdAt: DateTime.now(),

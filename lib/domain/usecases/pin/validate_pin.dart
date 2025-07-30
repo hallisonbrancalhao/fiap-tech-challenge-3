@@ -1,6 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:tech_challenge_3/core/usecase/usecase.dart';
-import 'package:tech_challenge_3/domain/repository/pin.dart';
+import 'package:tech_challenge_3/domain/repository/pin_repository.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
 class ValidatePinUseCase implements UseCase<Either<String, bool>, String> {

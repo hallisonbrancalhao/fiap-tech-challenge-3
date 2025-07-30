@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:tech_challenge_3/data/models/pin_dto.dart';
-import 'package:tech_challenge_3/data/source/pin_local_service.dart';
 import 'package:tech_challenge_3/domain/entities/pin.dart';
-import 'package:tech_challenge_3/domain/repository/pin.dart';
+import 'package:tech_challenge_3/domain/repository/pin_repository.dart';
+import 'package:tech_challenge_3/domain/source/pin_local_service.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
 class PinRepositoryImpl implements PinRepository {

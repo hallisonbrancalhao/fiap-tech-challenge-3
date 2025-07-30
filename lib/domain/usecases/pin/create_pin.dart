@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:tech_challenge_3/core/usecase/usecase.dart';
 import 'package:tech_challenge_3/domain/entities/pin.dart';
-import 'package:tech_challenge_3/domain/repository/pin.dart';
+import 'package:tech_challenge_3/domain/repository/pin_repository.dart';
 import 'package:tech_challenge_3/service_locator.dart';
 
 class CreatePinUseCase implements UseCase<Either<String, void>, String> {
