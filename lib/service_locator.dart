@@ -3,7 +3,10 @@ import 'package:tech_challenge_3/core/network/dio_client.dart';
 import 'package:tech_challenge_3/data/repository/auth_repository.dart';
 import 'package:tech_challenge_3/data/repository/pin.dart';
 import 'package:tech_challenge_3/data/repository/transactions_repository.dart';
+import 'package:tech_challenge_3/data/source/local_service.dart';
 import 'package:tech_challenge_3/data/source/pin_local_service.dart';
+import 'package:tech_challenge_3/data/source/auth_service.dart';
+import 'package:tech_challenge_3/data/source/transactions_api_service.dart';
 import 'package:tech_challenge_3/domain/repository/pin_repository.dart';
 import 'package:tech_challenge_3/domain/repository/auth_repository.dart';
 import 'package:tech_challenge_3/domain/repository/transactions_repository.dart';
@@ -28,7 +31,12 @@ void setupServiceLocator() {
   sl.registerLazySingleton<DioClient>(() => DioClient());
 
   // Services
+  sl.registerLazySingleton<AuthService>(() => AuthServiceImpl());
+  sl.registerLazySingleton<LocalService>(() => LocalServiceImpl());
   sl.registerLazySingleton<PinLocalService>(() => PinLocalServiceImpl());
+  sl.registerLazySingleton<TransactionsService>(
+    () => TransactionsApiServiceImpl(),
+  );
 
   // Repositories
   sl.registerLazySingleton<AuthRepository>(
