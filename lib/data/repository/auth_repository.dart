@@ -105,12 +105,31 @@ class AuthRepositoryImpl extends AuthRepository {
   }
 
   @override
+  Future<Either<String, String>> getLocalUserUid() async {
+    final result = await localService.getToken('uid');
+    if (result == null) {
+      return Left('User ID not found in local storage');
+    }
+    return Right(result);
+  }
+
+  @override
   Future<Either<String, void>> saveUserToken(String token) async {
     try {
       await localService.setToken('token', token);
       return Right(null);
     } catch (error) {
       return Left('Failed to save user token: $error');
+    }
+  }
+
+  @override
+  Future<Either<String, void>> saveUserUid(String userId) async {
+    try {
+      await localService.setToken('uid', userId);
+      return Right(null);
+    } catch (error) {
+      return Left('Failed to save user ID: $error');
     }
   }
 }
