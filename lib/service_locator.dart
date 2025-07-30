@@ -1,15 +1,14 @@
 import 'package:get_it/get_it.dart';
 import 'package:tech_challenge_3/core/network/dio_client.dart';
-import 'package:tech_challenge_3/data/repository/auth.dart';
-import 'package:tech_challenge_3/data/repository/transactions.dart';
+import 'package:tech_challenge_3/data/repository/auth_repository.dart';
 import 'package:tech_challenge_3/data/repository/pin.dart';
-import 'package:tech_challenge_3/data/source/auth_api_service.dart';
-import 'package:tech_challenge_3/data/source/auth_local_service.dart';
-import 'package:tech_challenge_3/data/source/transactions_api_service.dart';
-import 'package:tech_challenge_3/data/source/pin_local_service.dart';
-import 'package:tech_challenge_3/domain/repository/auth.dart';
-import 'package:tech_challenge_3/domain/repository/transactions.dart';
+import 'package:tech_challenge_3/data/repository/transactions_repository.dart';
 import 'package:tech_challenge_3/domain/repository/pin.dart';
+import 'package:tech_challenge_3/domain/repository/auth_repository.dart';
+import 'package:tech_challenge_3/domain/repository/transactions_repository.dart';
+import 'package:tech_challenge_3/domain/source/auth_service.dart';
+import 'package:tech_challenge_3/domain/source/local_service.dart';
+import 'package:tech_challenge_3/domain/source/transactions_service.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/get_user.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/is_logged_in.dart';
 import 'package:tech_challenge_3/domain/usecases/auth/logout.dart';
@@ -24,30 +23,38 @@ import 'package:tech_challenge_3/domain/usecases/pin/validate_pin.dart';
 final sl = GetIt.instance;
 
 void setupServiceLocator() {
-  sl.registerSingleton<DioClient>(DioClient());
-
-  // Services
-  sl.registerSingleton<AuthApiService>(AuthApiServiceImpl());
-  sl.registerSingleton<AuthLocalService>(AuthLocalServiceImpl());
-  sl.registerSingleton<TransactionsApiService>(TransactionsApiServiceImpl());
-  sl.registerSingleton<PinLocalService>(PinLocalServiceImpl());
+  sl.registerLazySingleton<DioClient>(() => DioClient());
 
   // Repositories
-  sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
-  sl.registerSingleton<TransactionsRepository>(TransactionsRepositoryImpl());
-  sl.registerSingleton<PinRepository>(PinRepositoryImpl());
+  sl.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      authService: sl<AuthService>(),
+      localService: sl<LocalService>(),
+    ),
+  );
+  sl.registerLazySingleton<TransactionsRepository>(
+    () => TransactionsRepositoryImpl(
+      transactionsService: sl<TransactionsService>(),
+    ),
+  );
+
+  sl.registerLazySingleton<PinRepository>(() => PinRepositoryImpl());
 
   // Usecases
-  sl.registerSingleton<SignupUseCase>(SignupUseCase());
-  sl.registerSingleton<IsLoggedInUseCase>(IsLoggedInUseCase());
-  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
-  sl.registerSingleton<LogoutUseCase>(LogoutUseCase());
-  sl.registerSingleton<SigninUseCase>(SigninUseCase());
-  sl.registerSingleton<CreateTransactionUseCase>(CreateTransactionUseCase());
-  sl.registerSingleton<GetTransactionsUseCase>(GetTransactionsUseCase());
-  sl.registerSingleton<UploadTransactionAttachmentUseCase>(
-    UploadTransactionAttachmentUseCase(),
+  sl.registerLazySingleton<SignupUseCase>(() => SignupUseCase());
+  sl.registerLazySingleton<IsLoggedInUseCase>(() => IsLoggedInUseCase());
+  sl.registerLazySingleton<GetUserUseCase>(() => GetUserUseCase());
+  sl.registerLazySingleton<LogoutUseCase>(() => LogoutUseCase());
+  sl.registerLazySingleton<SigninUseCase>(() => SigninUseCase());
+  sl.registerLazySingleton<CreateTransactionUseCase>(
+    () => CreateTransactionUseCase(),
   );
-  sl.registerSingleton<CreatePinUseCase>(CreatePinUseCase());
-  sl.registerSingleton<ValidatePinUseCase>(ValidatePinUseCase());
+  sl.registerLazySingleton<GetTransactionsUseCase>(
+    () => GetTransactionsUseCase(),
+  );
+  sl.registerLazySingleton<UploadTransactionAttachmentUseCase>(
+    () => UploadTransactionAttachmentUseCase(),
+  );
+  sl.registerLazySingleton<CreatePinUseCase>(() => CreatePinUseCase());
+  sl.registerLazySingleton<ValidatePinUseCase>(() => ValidatePinUseCase());
 }
