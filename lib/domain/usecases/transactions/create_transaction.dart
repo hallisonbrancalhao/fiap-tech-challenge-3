@@ -20,9 +20,16 @@ class CreateTransactionUseCase
         if (user == null) {
           return Left('User not authenticated');
         }
+        double amount = param?.amount ?? 0;
+
+        if (param?.type == TransactionType.withdrawal &&
+            param?.type == TransactionType.transfer) {
+          amount = amount * -1;
+        }
+
         final newParams = TransactionCreateDto(
           userUid: user.uid,
-          amount: param?.amount ?? 0.0,
+          amount: amount,
           description: param?.description ?? '',
           date: param?.date ?? DateTime.now(),
           type: param?.type ?? TransactionType.deposit,
