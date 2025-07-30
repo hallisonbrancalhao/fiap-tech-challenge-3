@@ -37,15 +37,21 @@ class TransactionsRepositoryImpl implements TransactionsRepository {
   }
 
   @override
-  Future<Either<Exception, List<TransactionEntity>>> getTransactions(
-    String userId,
+  Future<Either<String, List<TransactionEntity>>> getTransactions(
+    String? userId,
   ) async {
+    print('Fetching transactions for user: $userId');
+
+    if (userId == null) {
+      return Right([]);
+    }
+
     Either<Exception, List<TransactionModel>> result = await transactionsService
         .getTransactions(userId);
 
     return result.fold(
       (error) {
-        return Left(error);
+        return Left('Failed to fetch transactions: $error');
       },
       (data) {
         final List<TransactionEntity> transactions =

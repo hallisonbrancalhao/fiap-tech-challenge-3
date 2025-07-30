@@ -12,5 +12,7 @@ abstract class AuthRepository {
   Future<Either<String, void>> signOut();
   Future<bool> isLoggedIn();
   Future<Either<String, void>> removeTokensFromLocal();
+  Future<Either<String, String>> getLocalUserUid();
   Future<Either<String, void>> saveUserToken(String token);
+  Future<Either<String, void>> saveUserUid(String userId);
 }
