@@ -22,7 +22,7 @@ class CreateTransactionUseCase
         }
         double amount = param?.amount ?? 0;
 
-        if (param?.type == TransactionType.withdrawal &&
+        if (param?.type == TransactionType.withdrawal ||
             param?.type == TransactionType.transfer) {
           amount = amount * -1;
         }
